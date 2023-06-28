@@ -1,0 +1,47 @@
+.title-bar{
+    font-size: 12px;
+    z-index: 10009;
+    display: flex;
+    background-color: rgb(92, 92, 92);
+    -webkit-app-region: drag;
+    user-select: none;
+    position: absolute;
+    height: 36px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.3);
+}
+.title-line{
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin-left: 50px;
+}
+.options{
+    -webkit-app-region: no-drag;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    color: white;
+}
+.options .option{
+    position: relative;
+    display: inline-block;
+}
+.options .option-title{
+    padding: 4px;
+    padding-left: 7px;
+    padding-right: 7px;
+    border-radius: 3px;
+}
+.options .option-title:hover{
+    background-color: rgb(79, 79, 79);
+}
+.app-icon{
+    height: 100%;
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

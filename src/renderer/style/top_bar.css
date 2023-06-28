@@ -1,0 +1,127 @@
+.nav_bar{
+    background-color: thistle;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 100%;
+}
+.links > li{
+    display: inline-block;
+    padding: 0px 20px;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    margin: 0px 40px;
+    padding: 0px 30px;
+    color: rgb(109, 101, 221);
+    font-weight: 600;
+    font-size: 40px;
+    background-color: aqua;
+}
+.user_icon{
+    user-select: none;
+    padding-left: 50px;
+    height: 100%;
+}
+.admin_link{
+    user-select: none;
+    padding: 0 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: cornflowerblue;
+    font-size: 24px;
+}
+.user_name{
+    height: 100%;
+    box-sizing: border-box;
+    width: 130px;
+    text-align: center;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: cornflowerblue;
+    font-size: 24px;
+}
+.admin_link > a{
+    color: cornflowerblue;
+}
+.admin_link:hover{
+    background-color: rgb(68, 62, 86);
+}
+.user_name.active{
+    background-color: rgb(68, 62, 86);
+}
+.actions_drop{
+    opacity: 0;
+    user-select: none;
+    pointer-events: none;
+    box-shadow:0 0 .25em rgba(0,0,0,.25);
+    width: 130px;
+    background-color: rgb(105, 92, 143);
+    position: absolute;
+    margin: 0;
+    border-radius: 0 0 10px 10px;
+    transition: all 400ms;
+}
+.actions_drop.active{
+    opacity: 100;
+    user-select: all;
+    pointer-events: all;
+}
+#window-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 46px);
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+  }
+  
+  #window-controls .button {
+    grid-row: 1 / span 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  #min-button {
+    grid-column: 1;
+  }
+  #max-button, #restore-button {
+    grid-column: 2;
+  }
+  #close-button {
+    grid-column: 3;
+  }
+  #window-controls {
+    -webkit-app-region: no-drag;
+  }
+  
+  #window-controls .button {
+    user-select: none;
+  }
+  #window-controls .button:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  #window-controls .button:active {
+    background: rgba(255,255,255,0.2);
+  }
+  
+  #close-button:hover {
+    background: #E81123 !important;
+  }
+  #close-button:active {
+    background: #F1707A !important;
+  }
+  #close-button:active .icon {
+    filter: invert(1);
+  }
+  
+  #restore-button {
+    display: none !important;
+  }

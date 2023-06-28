@@ -1,0 +1,21 @@
+.drop-down{
+    background-color: rgb(67, 66, 66);
+    border-color: rgb(160, 159, 159);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 7px;
+    max-height: 500px;
+    width: 250px;
+    display: block;
+    position: absolute;
+    opacity: 0;
+    padding: 5px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.3);
+    user-select: none;
+    pointer-events: none;
+}
+.drop-down.open{
+    opacity: 100;
+    transition: all 300ms;
+    pointer-events: all;
+}

@@ -1,0 +1,21 @@
+.selector_cont{
+    width: var(--cell-width);
+    height: var(--cell-height);
+    margin: var(--cell-margin);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.row_col_selector{
+    background-color: rgb(117, 138, 138);
+    width: calc(var(--cell-width) - 30px);
+    height: calc(var(--cell-height) - 20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    padding: 0;
+}
+.row_col_selector.active{
+    background-color: #7a93b9;
+}

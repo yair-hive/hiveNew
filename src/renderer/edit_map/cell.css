@@ -1,0 +1,13 @@
+.cell{
+    width: var(--cell-width);
+    height: var(--cell-height);
+    margin: var(--cell-margin);
+    border-radius: 3px;
+    background: #323a46;
+}
+.cell.selected{
+    border-style: solid;
+    border-width: 0.1px;
+    border-color: #7a8392;
+    background: #555b66;
+} 

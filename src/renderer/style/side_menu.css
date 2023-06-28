@@ -1,0 +1,44 @@
+.sub_menu{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: rgb(110, 110, 110);
+    border-radius: 5px;
+}
+input{
+    height: 30px;
+    text-align: center;
+    margin: 5px;
+    padding: 0;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    outline: none;
+    border: none;
+}
+.guest_group{
+    color: yellow;
+}
+.results{
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 5px;
+    border-radius: 5px;
+    padding: 10px;
+    overflow: auto;
+    max-height: 40vh;
+    background-color: rgb(171, 150, 255);
+}
+.results > li{
+    padding-top: 1px;
+    padding-bottom: 1px;
+    display: flex;
+    justify-content: space-between;
+}
+.results > li > span > .seat_number{
+    color: #344052;
+}
+.sub_menu{
+    margin: 10px 0;
+}

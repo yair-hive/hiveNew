@@ -1,0 +1,38 @@
+.requests-count{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.request-box{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(49, 49, 190);
+    border-radius: 15px;
+    color: white;
+    margin: 0 5px;
+    font-size: 12px;
+}
+.request-box .text{
+    margin: 5px 10px;
+    white-space: nowrap;
+}
+.request-box .delete{
+    background-color: grey;
+    /* border-color: rgb(75, 73, 73);
+    border-width: 1px;
+    border-style: solid; */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+    width: 18px;
+    margin: 1px;
+    margin-right: 3px;
+    color: black;
+}
+.request-box .delete:hover{
+    background-color: rgb(147, 147, 147);
+}

@@ -1,0 +1,60 @@
+.inputBox{
+    z-index: 10;
+    margin: 7px;
+    border: none;
+}
+input:focus{
+    border: none;
+    outline: none;
+}
+.drop_down {
+    position: fixed;
+    color: black;
+    z-index: 10;
+    font-size: 11px;
+    text-align: right;
+    font-weight: bold;
+    width: auto;
+    width: 180px;
+    background-color: rgb(202, 248, 248);
+    border-radius: 3px;
+    box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.3);
+}
+.drop_down > ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.rolling-list{
+    overflow: auto;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.rolling-list-item.active{
+    background-color: #4f90f275;
+}
+.drop_down > ul > li{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 5px 15px 5px 15px;
+    list-style: none;
+}
+.rolling-list > li{
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 5px 15px 5px 15px;
+    list-style: none;
+}
+.group_name{
+    color: rgb(124, 116, 116);
+}
+.input_box{
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    background-color: rgb(167, 156, 243);
+    border-radius: 0 0 0.25rem 0.25rem;
+}
