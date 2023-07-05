@@ -28,9 +28,17 @@ const getAssetPath = (...paths: string[]): string => {
 };
 
 function getSettings() {
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<string>((resolve) => {
     readFile(path.join(__dirname, '../settings.json'), (err, data) => {
-      if (err) reject(err);
+      if (err) {
+        writeFile(
+          path.join(__dirname, '../settings.json'),
+          '{"serverPort":3025,"serverHost":"localhost"}',
+          () => {
+            resolve('{"serverPort":3025,"serverHost":"localhost"}');
+          }
+        );
+      }
       if (data) resolve(data.toString());
     });
   });

@@ -60,13 +60,6 @@ function App() {
   }
 
   useEffect(() => {
-    async function logSettings() {
-      const settingsToLog = await window.electron.getSettings();
-      console.log(settingsToLog);
-    }
-
-    logSettings();
-
     hiveSocket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       if (data.action == 'invalidate') {
