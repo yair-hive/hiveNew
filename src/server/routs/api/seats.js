@@ -36,9 +36,6 @@ seats.get = async function (request_body) {
   check_parameters(['map_name', 'project_name'], request_body);
   const { map_name } = request_body;
   const { project_name } = request_body;
-  // var map_id = await get_map_id(map_name, project_name);
-  // var query_string = `SELECT * FROM seats WHERE map = '${map_id}'`;
-  // return await db_get(query_string);
   return await getSeatsScoreByMap(project_name, map_name);
 };
 seats.get_all = async function (request_body) {

@@ -1,62 +1,51 @@
+/* eslint-disable react/jsx-no-constructed-context-values */
+/* eslint-disable consistent-return */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-plusplus */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react/jsx-no-bind */
+/* eslint-disable import/no-cycle */
+/* eslint-disable react/prop-types */
+/* eslint-disable camelcase */
 /* eslint-disable react-hooks/exhaustive-deps */
 // import SelectionArea from '@viselect/react'
-import SelectionArea, { useSelection } from "hive-select";
-import { useContext, useEffect, useState } from "react";
-import React from "react";
-import { useHive } from "../app_hooks";
-import { ActionsContext, EditContext, MBloaderContext } from "../app";
-import AddGuestDropDown from "./add_guest_drop_down";
-import Cell from "./cell";
-import "./map_cont.css";
-import "../style/side_menu.css";
-import MBloader from "../hive_elements/MBloader";
-import {
-  useSeatsCreate,
-  useSeatsData,
-  useSeatsDelete,
-  useSeatsUpdate,
-} from "../querys/seats";
-import { useTagBelongsCreate } from "../querys/tag_belongs";
-import {
-  useMapElementsCreate,
-  useMapElementsData,
-  useMapElementsDelete,
-} from "../querys/map_elements";
-import { map_add_presers } from "./map_add_presers";
-import { useMapsData, useMapsUpdate } from "../querys/maps";
-import { map_delete_presers } from "./map_delete_presers";
-import {
-  useSeatsGroupsCreate,
-  useSeatsGroupsData,
-} from "../querys/seats_groups";
-import { useParams } from "react-router-dom";
-import Prompt from "../hive_elements/Prompt";
+import SelectionArea, { useSelection } from 'hive-select';
+import React, { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import api from 'renderer/api/api';
+import { useHive } from '../app_hooks';
+import { ActionsContext, EditContext, MBloaderContext } from '../app';
+import Cell from './cell';
+import './map_cont.css';
+import '../style/side_menu.css';
+import MBloader from '../hive_elements/MBloader';
+import { map_add_presers } from './map_add_presers';
+import { map_delete_presers } from './map_delete_presers';
+// import MapAdd from './mapAddHook';
+import Prompt from '../hive_elements/Prompt';
 
 export const DropContext = React.createContext(null);
 export const SelectedContext = React.createContext(null);
 export const SelectedRCcontext = React.createContext(null);
 
-function MapNav() {
-  return <div className="naps-nav"></div>;
-}
-
 function MapSelection({ children }) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [MBloaderStatus, setMBloaderStatus] = useContext(MBloaderContext);
 
-  var className = "selection_bond main_bord";
+  let className = 'selection_bond main_bord';
   if (MBloaderStatus !== 0 && MBloaderStatus !== 100) {
-    var mb = document.getElementsByClassName("selection_bond")[0];
+    const mb = document.getElementsByClassName('selection_bond')[0];
     mb.scrollTop = 0;
     mb.scrollLeft = 0;
-    className += " in_of";
+    className += ' in_of';
   }
 
   function onStart({ event, selection }) {
     if (!event.ctrlKey && !event.metaKey) {
       selection.clearSelection();
       document
-        .querySelectorAll(".selected")
-        .forEach((e) => e.classList.remove("selected"));
+        .querySelectorAll('.selected')
+        .forEach((e) => e.classList.remove('selected'));
     }
   }
   function onMove({
@@ -64,12 +53,12 @@ function MapSelection({ children }) {
       changed: { added, removed },
     },
   }) {
-    added.forEach((ele) => ele.classList.add("selected"));
-    removed.forEach((ele) => ele.classList.remove("selected"));
+    added.forEach((ele) => ele.classList.add('selected'));
+    removed.forEach((ele) => ele.classList.remove('selected'));
   }
   return (
     <SelectionArea
-      selectables={".selectable"}
+      selectables=".selectable"
       onStart={onStart}
       onMove={onMove}
       behaviour={{ scrolling: { startScrollMargins: { x: 150, y: 0 } } }}
@@ -81,38 +70,38 @@ function MapSelection({ children }) {
 }
 
 function MapBody() {
-  const map = useMapsData();
-  const seats = useSeatsData();
-  const elements = useMapElementsData();
-  const seats_groups = useSeatsGroupsData();
-
+  const map = api.maps.useData();
+  const seats = api.seats.useData();
+  const elements = api.mapElements.useData();
+  const seats_groups = api.seatsGroups.useData();
+  const selection = useSelection();
   const Hive = useHive();
 
   function getSelectedBounds() {
-    var selected = selection.getSelection();
-    var rows = [];
-    var cols = [];
-    for (let cell of selected) {
-      var row = Number(cell.getAttribute("cell-row"));
-      var col = Number(cell.getAttribute("cell-col"));
+    const selected = selection.getSelection();
+    const rows = [];
+    const cols = [];
+    for (const cell of selected) {
+      const row = Number(cell.getAttribute('cell-row'));
+      const col = Number(cell.getAttribute('cell-col'));
       if (rows.indexOf(row) === -1) rows.push(row);
       if (cols.indexOf(col) === -1) cols.push(col);
     }
-    cols.sort(function (a, b) {
+    cols.sort((a, b) => {
       return a - b;
     });
-    rows.sort(function (a, b) {
+    rows.sort((a, b) => {
       return a - b;
     });
-    var from_row = rows[0];
-    var from_col = cols[0];
-    var to_row = rows[rows.length - 1];
-    var to_col = cols[cols.length - 1];
-    var data = {
-      from_row: from_row,
-      from_col: from_col,
-      to_row: to_row,
-      to_col: to_col,
+    const from_row = rows[0];
+    const from_col = cols[0];
+    const to_row = rows[rows.length - 1];
+    const to_col = cols[cols.length - 1];
+    const data = {
+      from_row,
+      from_col,
+      to_row,
+      to_col,
     };
     return data;
   }
@@ -123,28 +112,30 @@ function MapBody() {
   const [groupNameToAdd, setGroupToAdd] = useState();
   const [selected_seat, setSelectedSeat] = useState(null);
   const [selectedRC, setSelectedRC] = useState({});
+  // const [addStatus, setAddStatus] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [action, setAction] = useContext(ActionsContext);
-  const selection = useSelection();
 
   const [dropDownPos, setDropDownPos] = useState(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [edit, setEdit] = useContext(EditContext);
 
-  const seats_create = useSeatsCreate();
-  const tags_create = useTagBelongsCreate();
-  const numbers_update = useSeatsUpdate().numbers;
-  const elements_create = useMapElementsCreate();
-  const groups_create = useSeatsGroupsCreate();
-  const map_update = useMapsUpdate();
+  const seats_create = api.seats.useCreate();
+  const tags_create = api.tagBelongs.useCreate();
+  const numbers_update = api.seats.useUpdate().numbers;
+  const elements_create = api.mapElements.useCreate();
+  const groups_create = api.seatsGroups.useCreate();
+  const map_update = api.maps.useUpdate();
 
-  const seats_delete = useSeatsDelete();
-  const elements_delete = useMapElementsDelete();
+  const seats_delete = api.seats.useDelete();
+  const elements_delete = api.mapElements.useDelete();
 
   function getSelectedIds() {
-    var selected = selection.getSelection();
-    var seats = [];
+    const selected = selection.getSelection();
+    const seats = [];
     for (let i = 0; i < selected.length; i++) {
-      var seat = selected[i];
-      var seat_id = seat.getAttribute("seat_id");
+      const seat = selected[i];
+      const seat_id = seat.getAttribute('seat_id');
       seats.push(seat_id);
     }
     return seats;
@@ -152,34 +143,30 @@ function MapBody() {
 
   useEffect(() => {
     if (tagNameToAdd) {
-      var selectedSeats = getSelectedIds();
+      const selectedSeats = getSelectedIds();
       tags_create({ seats: selectedSeats, tag_name: tagNameToAdd });
     }
   }, [tagNameToAdd]);
   useEffect(() => {
     if (elementNameToAdd) {
-      var selectedBounds = getSelectedBounds();
-      elements_create({
-        data: { name: elementNameToAdd, ...selectedBounds },
-      });
+      const selectedBounds = getSelectedBounds();
+      elements_create({ element_name: elementNameToAdd, ...selectedBounds });
     }
   }, [elementNameToAdd]);
   useEffect(() => {
     if (groupNameToAdd) {
-      var selectedBounds = getSelectedBounds();
-      groups_create({
-        data: { name: groupNameToAdd, ...selectedBounds },
-      });
+      const selectedBounds = getSelectedBounds();
+      groups_create({ group_name: groupNameToAdd, ...selectedBounds });
     }
   }, [groupNameToAdd]);
   useEffect(() => {
     if (seatNumberToAdd) {
-      var col_name = seatNumberToAdd;
-      var seatNumber = Number(col_name) + 1;
-      var elements = selection.getSelection();
-      var data = [];
-      for (let element of elements) {
-        var seat_id = element.getAttribute("seat_id");
+      const col_name = seatNumberToAdd;
+      let seatNumber = Number(col_name) + 1;
+      const elements = selection.getSelection();
+      const data = [];
+      for (const element of elements) {
+        const seat_id = element.getAttribute('seat_id');
         data.push({ id: seat_id, number: seatNumber });
         seatNumber++;
       }
@@ -187,41 +174,40 @@ function MapBody() {
     }
   }, [seatNumberToAdd]);
 
-  if (edit === "ערוך") {
+  if (edit === 'ערוך') {
     if (selection?.enable) selection.enable();
   }
-  if (edit === "אל תערוך") {
+  if (edit === 'אל תערוך') {
     if (selection?.disable) selection.disable();
   }
 
   function onMousedown(event) {
-    var classList = event.target.classList;
+    const { classList } = event.target;
     if (
       !event.ctrlKey &&
       !event.metaKey &&
-      !classList.contains("hive_button") &&
-      !classList.contains("hive_but")
+      !classList.contains('hive_button') &&
+      !classList.contains('hive_but')
     ) {
       setSelectedRC({});
       if (
-        !classList.contains("name_box") &&
-        !classList.contains("drop_down") &&
-        !classList.contains("rolling-list-item")
+        !classList.contains('name_box') &&
+        !classList.contains('drop_down') &&
+        !classList.contains('rolling-list-item')
       ) {
         setDropDownPos(false);
       }
     }
-    if (event.keyCode != 13) {
-      var classList = event.target.classList;
+    if (event.keyCode !== 13) {
       if (
         !event.ctrlKey &&
         !event.metaKey &&
-        !classList.contains("hive_button")
+        !classList.contains('hive_button')
       ) {
-        if (!event.target.classList.contains("cell")) {
+        if (!event.target.classList.contains('cell')) {
           document
-            .querySelectorAll(".selected")
-            .forEach((e) => e.classList.remove("selected"));
+            .querySelectorAll('.selected')
+            .forEach((e) => e.classList.remove('selected'));
         }
       }
     }
@@ -229,31 +215,28 @@ function MapBody() {
 
   function map_add() {
     if (selectedRC.dir) {
-      if (selectedRC.dir === "row") {
+      if (selectedRC.dir === 'row') {
         map_update.add_row({ row: selectedRC.number });
       }
-      if (selectedRC.dir === "col") {
+      if (selectedRC.dir === 'col') {
         map_update.add_col({ col: selectedRC.number });
       }
       return;
     }
-    if (action == "tags") {
-      console.log("psdfgfh");
-      Hive.openPopUp("hive_super");
-      console.log(Hive.pop_ups);
+    if (action === 'tags') {
+      Hive.openPopUp('hive_super');
       return;
     }
-    if (action == "numbers") {
-      Hive.openPopUp("add_seat_number");
-      console.log(Hive.pop_ups);
+    if (action === 'numbers') {
+      Hive.openPopUp('add_seat_number');
       return;
     }
-    if (action == "elements") {
-      Hive.openPopUp("add_element");
+    if (action === 'elements') {
+      Hive.openPopUp('add_element');
       return;
     }
-    if (action == "groups") {
-      Hive.openPopUp("add_area");
+    if (action === 'groups') {
+      Hive.openPopUp('add_area');
       return;
     }
     const mutations = {
@@ -267,10 +250,10 @@ function MapBody() {
   }
   function map_delete() {
     if (selectedRC.dir) {
-      if (selectedRC.dir === "row") {
+      if (selectedRC.dir === 'row') {
         map_update.delete_row({ row: selectedRC.number });
       }
-      if (selectedRC.dir === "col") {
+      if (selectedRC.dir === 'col') {
         map_update.delete_col({ col: selectedRC.number });
       }
       return;
@@ -279,52 +262,49 @@ function MapBody() {
       seats: seats_delete,
       elements: elements_delete,
     };
-    console.log({ action });
-    console.log({ map_delete_presers });
-    console.log({ mutations });
     return mutations[action](map_delete_presers[action]());
   }
   function onKeyDown(event) {
-    if (edit === "ערוך") {
-      if (event.code == "Enter") map_add();
-      if (event.code == "Delete") map_delete();
+    if (edit === 'ערוך') {
+      if (event.code === 'Enter') map_add();
+      if (event.code === 'Delete') map_delete();
     }
   }
 
   useEffect(() => {
-    document.addEventListener("mousedown", onMousedown);
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener('mousedown', onMousedown);
+    document.addEventListener('keydown', onKeyDown);
     return () => {
-      document.removeEventListener("mousedown", onMousedown);
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener('mousedown', onMousedown);
+      document.removeEventListener('keydown', onKeyDown);
     };
   }, [action, selectedRC]);
 
   function render_cells() {
-    var cells_elements = [];
-    var list = [];
-    var RCindex = [];
+    const cells_elements = [];
+    const list = [];
+    const RCindex = [];
     if (map.data) {
-      var i = 0;
+      let i = 0;
       for (let row = 0; row <= map.data.rows_number; row++) {
         RCindex[row] = [];
-        if (row != 0) {
+        if (row !== 0) {
           for (let col = 0; col <= map.data.columns_number; col++) {
-            if (col != 0) {
+            if (col !== 0) {
               RCindex[row][col] = i;
               list[i] = {
-                row: row,
-                col: col,
-                type: "plase_holder",
+                row,
+                col,
+                type: 'plase_holder',
               };
               i++;
             } else {
               RCindex[row][col] = i;
               list[i] = {
-                row: row,
-                col: col,
-                dir: "row",
-                type: "RC",
+                row,
+                col,
+                dir: 'row',
+                type: 'RC',
               };
               i++;
             }
@@ -333,10 +313,10 @@ function MapBody() {
           for (let col = 0; col <= map.data.columns_number; col++) {
             RCindex[row][col] = i;
             list[i] = {
-              row: row,
-              col: col,
-              dir: "col",
-              type: "RC",
+              row,
+              col,
+              dir: 'col',
+              type: 'RC',
             };
             i++;
           }
@@ -344,24 +324,26 @@ function MapBody() {
       }
     }
     if (map.data && seats.data) {
-      var i = 0;
-      var seats_array = Object.entries(seats.data);
-      for (let [key, seat] of seats_array) {
+      const seats_array = Object.entries(seats.data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for (const [key, seat] of seats_array) {
         if (seat) {
           try {
-            var cell = list[RCindex[seat.row_num][seat.col_num]];
+            const cell = list[RCindex[seat.row_num][seat.col_num]];
             list[RCindex[seat.row_num][seat.col_num]] = {
               ...seat,
               ...cell,
-              type: "seat",
+              type: 'seat',
             };
-          } catch (error) {}
-          i++;
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.log(error);
+          }
         }
       }
     }
     if (map.data && elements.data) {
-      for (let element of elements.data) {
+      for (const element of elements.data) {
         for (let row = element.from_row; row <= element.to_row; row++) {
           for (let col = element.from_col; col <= element.to_col; col++) {
             list[RCindex[row][col]] = null;
@@ -369,26 +351,26 @@ function MapBody() {
         }
         list[RCindex[element.from_row][element.from_col]] = {
           ...element,
-          type: "element",
+          type: 'element',
         };
       }
     }
     if (map.data && seats_groups.data) {
-      for (let group of seats_groups.data) {
+      for (const group of seats_groups.data) {
         group.from_row = Number(group.from_row);
         group.from_col = Number(group.from_col);
         group.to_row = Number(group.to_row);
         group.to_col = Number(group.to_col);
         for (let row = group.from_row; row <= group.to_row; row++) {
           for (let col = group.from_col; col <= group.to_col; col++) {
-            var cell = list[RCindex[row][col]];
+            const cell = list[RCindex[row][col]];
             list[RCindex[row][col]] = { ...cell, in_group: true };
           }
         }
       }
     }
-    var i = 0;
-    for (let cell of list) {
+    let i = 0;
+    for (const cell of list) {
       cells_elements.push(<Cell cell={cell} key={i} />);
       i++;
     }
@@ -396,15 +378,15 @@ function MapBody() {
   }
 
   function render_areas() {
-    var list = [];
-    var cells_elements = [];
+    const list = [];
+    const cells_elements = [];
     if (map.data && seats_groups.data) {
-      for (let group of seats_groups.data) {
-        list.push({ ...group, type: "group" });
+      for (const group of seats_groups.data) {
+        list.push({ ...group, type: 'group' });
       }
     }
-    var i = 0;
-    for (let cell of list) {
+    let i = 0;
+    for (const cell of list) {
       cells_elements.push(<Cell cell={cell} key={i} />);
       i++;
     }
@@ -412,18 +394,18 @@ function MapBody() {
   }
 
   function selected_rc() {
-    var from_col,
-      to_col,
-      from_row,
-      to_row = Number(0);
-    if (selectedRC.dir === "row") {
+    let from_col;
+    let to_col;
+    let from_row;
+    let to_row = Number(0);
+    if (selectedRC.dir === 'row') {
       from_col = 2;
       to_col = Number(map.data?.columns_number) + 2;
       from_row = Number(selectedRC.number) + 1;
       to_row = Number(selectedRC.number) + 1;
     }
 
-    if (selectedRC.dir === "col") {
+    if (selectedRC.dir === 'col') {
       from_col = Number(selectedRC.number) + 1;
       to_col = Number(selectedRC.number) + 1;
       from_row = 2;
@@ -445,17 +427,17 @@ function MapBody() {
     );
   }
 
-  var STYLE;
-  if (edit === "אל תערוך") {
+  let STYLE;
+  if (edit === 'אל תערוך') {
     STYLE = {
-      "--map-rows": map.data?.rows_number,
-      "--map-cols": map.data?.columns_number,
+      '--map-rows': map.data?.rows_number,
+      '--map-cols': map.data?.columns_number,
     };
   }
-  if (edit === "ערוך") {
+  if (edit === 'ערוך') {
     STYLE = {
-      "--map-rows": Number(map.data?.rows_number) + 1,
-      "--map-cols": Number(map.data?.columns_number) + 1,
+      '--map-rows': Number(map.data?.rows_number) + 1,
+      '--map-cols': Number(map.data?.columns_number) + 1,
     };
   }
 
@@ -480,6 +462,7 @@ function MapBody() {
           <SelectedContext.Provider value={[selected_seat, setSelectedSeat]}>
             <DropContext.Provider value={[dropDownPos, setDropDownPos]}>
               {/* <AddGuestDropDown/> */}
+              {/* <MapAdd open={addStatus} setOpen={setAddStatus} /> */}
               <div className="map_overlay" style={STYLE}>
                 {render_areas()}
                 {selected_rc()}
@@ -503,10 +486,10 @@ function Map() {
       <div
         className="main_bord"
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "white",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
         }}
       >
         <h1>{project_name}</h1>

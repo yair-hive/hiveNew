@@ -1,3 +1,5 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable react/jsx-no-constructed-context-values */
 /* eslint-disable eqeqeq */
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
@@ -8,11 +10,11 @@ import { useQueryClient } from 'react-query';
 import Maps from './pages/maps';
 import Guests from './pages/guests';
 import Login from './pages/login';
-import Projects from './pages/projects';
 import Home from './pages/home';
 import Admin from './pages/admin';
 import { HiveContext, useSocket } from './app_hooks';
 import TitleBar from './components/titleBar/titleBar';
+import { useSettingsData } from './api/useHiveFetch';
 
 export const MBloaderContext = React.createContext(0);
 export const EditContext = React.createContext('אל תערוך');
@@ -40,6 +42,8 @@ function App() {
   const [TableRefState, setTableRefState] = useState(null);
   const [fixedState, setfixedState] = useState(false);
 
+  const settings = useSettingsData();
+
   function openPopUp(id) {
     setPopUps((prev) => {
       const the_new = { ...prev };
@@ -57,8 +61,8 @@ function App() {
 
   useEffect(() => {
     async function logSettings() {
-      const settings = await window.electron.getSettings();
-      console.log(settings);
+      const settingsToLog = await window.electron.getSettings();
+      console.log(settingsToLog);
     }
 
     logSettings();
@@ -80,7 +84,7 @@ function App() {
     hiveSocket.onerror = (msg) => {
       console.log(msg);
     };
-  }, []);
+  }, [hiveSocket, queryClient]);
 
   useEffect(() => {
     function onEnter(event) {
@@ -97,6 +101,8 @@ function App() {
     openPopUp,
     closePopUp,
   };
+
+  if (!settings.data) return 'loading settings';
 
   return (
     <SocketIdContext.Provider value={socketId}>
@@ -151,10 +157,6 @@ function App() {
                               <Route
                                 path="/guests/:project_name/*"
                                 element={<Guests />}
-                              />
-                              <Route
-                                path="/projects/:project_name/*"
-                                element={<Projects />}
                               />
                               <Route path="/admin/*" element={<Admin />} />
                               <Route path="login" element={<Login />} />

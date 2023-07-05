@@ -2,30 +2,51 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { useSocket } from '../app_hooks';
-import new_api from '../new_api/new_api';
+import useHiveFetch from './useHiveFetch';
 
-export function useSeatsData() {
+function useData() {
   const { map_name, project_name } = useParams();
-  return useQuery(['seats', { map_name, project_name }], new_api.seats.get);
+  const hiveFetch = useHiveFetch();
+
+  return useQuery(['seats', { map_name, project_name }], () => {
+    const body = {
+      category: 'seats',
+      action: 'get',
+      map_name,
+      project_name,
+    };
+    return hiveFetch(body);
+  });
 }
-export function useSeatsDataScore() {
-  const { map_name, project_name } = useParams();
-  return useQuery(
-    ['seats', { map_name, project_name }],
-    new_api.seats.get_score
-  );
-}
-export function useSeatsDataAll() {
+function useDataAll() {
   const { project_name } = useParams();
-  return useQuery(['seats_all', { project_name }], new_api.seats.get_all);
+  const hiveFetch = useHiveFetch();
+
+  return useQuery(['seats_all', { project_name }], () => {
+    const body = {
+      category: 'seats',
+      action: 'get_all',
+      project_name,
+    };
+    return hiveFetch(body);
+  });
 }
-export function useSeatsCreate() {
+function useCreate() {
   const { map_name, project_name } = useParams();
   const hiveSocket = useSocket();
+  const hiveFetch = useHiveFetch();
+
   const mutation = useMutation(
     (seats) => {
       const seatsString = JSON.stringify(seats);
-      return new_api.seats.create(map_name, project_name, seatsString);
+      const body = {
+        category: 'seats',
+        action: 'create',
+        map_name,
+        project_name,
+        data: seatsString,
+      };
+      return hiveFetch(body);
     },
     {
       onSuccess: () => {
@@ -37,15 +58,22 @@ export function useSeatsCreate() {
       },
     }
   );
-  return mutation.mutate;
+  return mutation.mutateAsync;
 }
-export function useSeatsDelete() {
+function useDelete() {
   const { map_name, project_name } = useParams();
   const hiveSocket = useSocket();
+  const hiveFetch = useHiveFetch();
+
   const mutation = useMutation(
     (seats_ids) => {
       const seatsIdsString = JSON.stringify(seats_ids);
-      return new_api.seats.delete(seatsIdsString);
+      const body = {
+        category: 'seats',
+        action: 'delete',
+        seats_ids: seatsIdsString,
+      };
+      return hiveFetch(body);
     },
     {
       onSuccess: () => {
@@ -60,14 +88,21 @@ export function useSeatsDelete() {
 
   return mutation.mutate;
 }
-export function useSeatsUpdate() {
+function useUpdate() {
   const { map_name, project_name } = useParams();
   const queryClient = useQueryClient();
+  const hiveFetch = useHiveFetch();
 
   const nambers_mutation = useMutation(
     ({ data }) => {
       const dataString = JSON.stringify(data);
-      return new_api.seats.update.numbers(dataString);
+      const body = {
+        category: 'seats',
+        action: 'update',
+        fild: 'numbers',
+        seats_numbers: dataString,
+      };
+      return hiveFetch(body);
     },
     {
       onSuccess: () => {
@@ -77,6 +112,14 @@ export function useSeatsUpdate() {
   );
 
   return {
-    numbers: nambers_mutation.mutate,
+    numbers: nambers_mutation.mutateAsync,
   };
 }
+
+export default {
+  useData,
+  useDataAll,
+  useCreate,
+  useDelete,
+  useUpdate,
+};

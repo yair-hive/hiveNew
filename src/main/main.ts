@@ -3,7 +3,7 @@
 
 import { execFile } from 'node:child_process';
 import path from 'path';
-import { readFile } from 'fs';
+import { readFile, writeFile } from 'fs';
 import {
   app,
   BrowserWindow,
@@ -36,7 +36,17 @@ function getSettings() {
   });
 }
 
+// eslint-disable-next-line no-undef
+function setSettings(_event: Electron.IpcMainInvokeEvent, args: any[]) {
+  return new Promise<void>((resolve) => {
+    writeFile(path.join(__dirname, '../settings.json'), args[0], () => {
+      resolve();
+    });
+  });
+}
+
 ipcMain.handle('get-settings', getSettings);
+ipcMain.handle('set-settings', setSettings);
 
 function startMySql() {
   const childMySql = execFile(getAssetPath('/mysql/bin/mysqld.exe'), [
@@ -108,7 +118,7 @@ const createWindow = async () => {
     },
   });
 
-  ipcMain.on('update_progress', (event, args) => {
+  ipcMain.on('update_progress', (_event, args) => {
     mainWindow?.setProgressBar(Number(args) / 100);
   });
 
