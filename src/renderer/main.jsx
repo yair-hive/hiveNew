@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-no-constructed-context-values */
 import React, { useEffect, useState } from 'react';
 import { HashRouter } from 'react-router-dom';
@@ -16,7 +17,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function Main() {
+function SocketProvider({ children }) {
   const settings = useSettingsData();
   const [ws, setWs] = useState(new WebSocket('ws://localhost:3025'));
 
@@ -30,13 +31,19 @@ function Main() {
     }
   }, [settings.data]);
   return (
+    <HiveSocket.Provider value={[ws, setWs]}>{children}</HiveSocket.Provider>
+  );
+}
+
+function Main() {
+  return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <HashRouter>
-          <HiveSocket.Provider value={[ws, setWs]}>
+          <SocketProvider>
             <App />
             <ReactQueryDevtools />
-          </HiveSocket.Provider>
+          </SocketProvider>
         </HashRouter>
       </QueryClientProvider>
     </React.StrictMode>

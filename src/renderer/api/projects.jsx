@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 import { useMutation, useQuery } from 'react-query';
 import { useContext } from 'react';
-import { SocketIdContext } from 'renderer/App';
+import { SocketIdContext } from 'renderer/app';
 import { useParams } from 'react-router-dom';
 import useHiveFetch from './useHiveFetch';
 import { useSocket } from '../app_hooks';
