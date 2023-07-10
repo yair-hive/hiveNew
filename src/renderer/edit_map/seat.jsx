@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable no-redeclare */
@@ -27,24 +28,25 @@ import { DropContext, SelectedContext, SelectedRCcontext } from './map';
 import RollingList from '../hive_elements/rolling_list';
 import { ShowScoreContext } from '../pages/maps';
 
-function DropTest({ inputStr }) {
+function Drop({ inputStr }) {
   const guests = api.guests.useData();
-
+  const guestGroups = api.guestGroup.useData();
+  const belongs = api.seatBelongs.useData();
   const add_guest = api.seatBelongs.useCreate();
   const [dropDownPos, setDropDownPos] = useContext(DropContext);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selected_seat, setSelectedSeat] = useContext(SelectedContext);
+  const setSelectedSeat = useContext(SelectedContext)[1];
 
-  // useEffect(()=> setInputStr(''),[dropDownPos])
+  const belongIds = [];
+
+  belongs.data.forEach((belong) => {
+    belongIds.push(belong.guest);
+  });
 
   async function onItem(item) {
-    // const {exist} = await check_guest(item.value)
-    // if(exist){
     add_guest({
       guest_id: item.value,
       seat_id: dropDownPos,
     });
-    // }
     setDropDownPos(null);
     setSelectedSeat(null);
   }
@@ -57,7 +59,22 @@ function DropTest({ inputStr }) {
       for (const [index, corrent] of guest_array) {
         corrent.name = `${corrent.last_name} ${corrent.first_name}`;
         if (search_reg.test(corrent.name)) {
-          match_list.push({ name: corrent.name, value: corrent.id });
+          const guestGroup = guestGroups.data[corrent.guest_group].name;
+          const guestName = (
+            <div>
+              <span
+                style={{
+                  color: `${
+                    belongIds.indexOf(corrent.id) !== -1 ? '#e72a2a' : ''
+                  }`,
+                }}
+              >
+                {`${corrent.name} `}
+              </span>
+              | <span style={{ color: 'grey' }}>{guestGroup}</span>
+            </div>
+          );
+          match_list.push({ name: guestName, value: corrent.id });
         }
       }
     }
@@ -103,7 +120,6 @@ function getFontSize(str) {
 function NameBox({ seat_id, tags, guest_name, group_color, score }) {
   const [showScore, setShowScore] = useContext(ShowScoreContext);
   const [edit, setEdit] = useContext(EditContext);
-  // const [dropDownPos, setDropDownPos] = useState(false)
   const [dropDownPos, setDropDownPos] = useContext(DropContext);
   const [selected_seat, setSelectedSeat] = useContext(SelectedContext);
   const [inputStr, setInputStr] = useState('');
@@ -112,8 +128,6 @@ function NameBox({ seat_id, tags, guest_name, group_color, score }) {
 
   function nameBoxOnClick() {
     if (edit === 'אל תערוך') {
-      // setDropDownPos(nameBoxRef.current)
-      // setSelectedSeat(seat_id)
       setDropDownPos(seat_id);
     }
   }
@@ -135,8 +149,13 @@ function NameBox({ seat_id, tags, guest_name, group_color, score }) {
   if (dropDownPos === seat_id) {
     return (
       <>
-        <input onChange={onInput} className="name_box" style={{ margin: 0 }} />
-        <DropTest inputStr={inputStr} />
+        <input
+          onChange={onInput}
+          className="name_box"
+          style={{ margin: 0 }}
+          autoFocus
+        />
+        <Drop inputStr={inputStr} />
       </>
     );
   }

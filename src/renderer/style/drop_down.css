@@ -15,7 +15,7 @@ input:focus{
     text-align: right;
     font-weight: bold;
     width: auto;
-    width: 180px;
+    width: 200px;
     background-color: rgb(202, 248, 248);
     border-radius: 3px;
     box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.3);
