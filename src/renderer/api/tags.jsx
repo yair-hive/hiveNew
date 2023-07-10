@@ -18,7 +18,7 @@ function useData() {
   });
 }
 function useDelete() {
-  const { project_name } = useParams();
+  const { project_name, map_name } = useParams();
   const hiveSocket = useSocket();
   const hiveFetch = useHiveFetch();
 
@@ -34,7 +34,13 @@ function useDelete() {
     },
     {
       onSuccess: () => {
-        const msg = JSON.stringify({
+        let msg;
+        msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['tags_belongs', { map_name, project_name }],
+        });
+        hiveSocket.send(msg);
+        msg = JSON.stringify({
           action: 'invalidate',
           query_key: ['tags', { project_name }],
         });

@@ -74,6 +74,7 @@ function startMySql() {
     childMySql.stdout?.on('data', console.log);
   });
 }
+
 function startServer() {
   const serverProsess = utilityProcess.fork(
     path.join(__dirname, '../server/main.js')

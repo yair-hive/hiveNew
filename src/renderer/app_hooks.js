@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import React, { useContext } from 'react';
 
 export const HiveContext = React.createContext({});
@@ -8,5 +9,6 @@ export function useHive() {
 }
 
 export function useSocket() {
-  return useContext(HiveSocket);
+  const socketContext = useContext(HiveSocket);
+  if (socketContext.length > 1) return socketContext[0];
 }

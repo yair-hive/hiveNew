@@ -1,6 +1,11 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable camelcase */
 import { useMutation, useQuery } from 'react-query';
-import { useSocket } from '../app_hooks';
+import { useContext } from 'react';
+import { SocketIdContext } from 'renderer/App';
+import { useParams } from 'react-router-dom';
 import useHiveFetch from './useHiveFetch';
+import { useSocket } from '../app_hooks';
 
 function useData() {
   const hiveFetch = useHiveFetch();
@@ -37,8 +42,38 @@ function useCreate() {
   );
   return mutation.mutateAsync;
 }
+function useScheduling() {
+  const socketId = useContext(SocketIdContext);
+  const { project_name } = useParams();
+  const hiveFetch = useHiveFetch();
+  const hiveSocket = useSocket();
+
+  const mutation = useMutation(
+    () => {
+      const body = {
+        category: 'projectActions',
+        action: 'scheduling',
+        project_name,
+        socketId,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        let msg = '';
+        msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['belongs', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
+  return mutation.mutateAsync;
+}
 
 export default {
   useData,
   useCreate,
+  useScheduling,
 };

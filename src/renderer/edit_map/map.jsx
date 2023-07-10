@@ -224,19 +224,24 @@ function MapBody() {
       return;
     }
     if (action === 'tags') {
-      Hive.openPopUp('hive_super');
+      if (Hive.pop_ups.hive_super) {
+        Hive.closePopUp('hive_super');
+      } else Hive.openPopUp('hive_super');
       return;
     }
     if (action === 'numbers') {
-      Hive.openPopUp('add_seat_number');
+      if (Hive.pop_ups.add_seat_number) Hive.closePopUp('add_seat_number');
+      else Hive.openPopUp('add_seat_number');
       return;
     }
     if (action === 'elements') {
-      Hive.openPopUp('add_element');
+      if (Hive.pop_ups.add_element) Hive.closePopUp('add_element');
+      else Hive.openPopUp('add_element');
       return;
     }
     if (action === 'groups') {
-      Hive.openPopUp('add_area');
+      if (Hive.pop_ups.add_area) Hive.closePopUp('add_area');
+      else Hive.openPopUp('add_area');
       return;
     }
     const mutations = {

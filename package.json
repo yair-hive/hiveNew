@@ -235,6 +235,9 @@
       ],
       "category": "Development"
     },
+    "nsis": {
+      "oneClick": false
+    },
     "directories": {
       "app": "release/app",
       "buildResources": "assets",

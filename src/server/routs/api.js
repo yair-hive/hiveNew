@@ -13,6 +13,7 @@ import seat_belongs from './api/seat_belongs.js';
 import seats_groups from './api/seats_groups.js';
 import tag_belongs from './api/tag_belongs.js';
 import requests_belongs from './api/requests_belongs.js';
+import projectActions from './api/actions.js';
 
 const router = express.Router();
 
@@ -29,6 +30,7 @@ const actions = {
   tag_belongs,
   requests_belongs,
   users,
+  projectActions,
 };
 
 router.post('/', async (req, res) => {

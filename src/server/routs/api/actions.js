@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-async-promise-executor */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-return-assign */
 /* eslint-disable no-loop-func */
 /* eslint-disable no-return-await */
@@ -9,10 +12,11 @@
 /* eslint-disable func-names */
 /* eslint-disable camelcase */
 
-import express from 'express';
-import con from '../db/mysql/connction.js';
+import con from '../../db/mysql/connction.js';
+import wss from '../../socket.js';
+import { check_parameters } from './functions.js';
 
-const router = express.Router();
+const projectActions = {};
 
 function row_score(seats) {
   const rows = [];
@@ -60,23 +64,24 @@ function col_score(seats, map) {
 
   let i = 0;
   let n = 0;
+  let score;
   if (to === 'center') {
     cols.reverse();
     for (const col of cols) {
       n++;
       if (cols_even) {
-        if (n != cols_middle + 1) {
+        if (n !== cols_middle + 1) {
           if (n < cols_middle) i++;
           if (n > cols_middle) i--;
         }
-        if (n == cols_middle) i++;
+        if (n === cols_middle) i++;
         score = Math.abs(i);
       } else {
         if (n > cols_middle) i--;
         if (n < cols_middle) i++;
-        if (n == cols_middle) i++;
+        if (n === cols_middle) i++;
         score = i;
-        if (n == cols_middle) score = Math.abs(i);
+        if (n === cols_middle) score = Math.abs(i);
       }
       seats_by_col[col].forEach((index) => {
         seats[index].col_score = score;
@@ -85,7 +90,7 @@ function col_score(seats, map) {
   }
   if (to === 'left') {
     cols.reverse();
-    var score = 0;
+    let score = 0;
     for (const col of cols) {
       score++;
       seats_by_col[col].forEach((index) => {
@@ -94,7 +99,7 @@ function col_score(seats, map) {
     }
   }
   if (to === 'right') {
-    var score = 0;
+    let score = 0;
     for (const col of cols) {
       score++;
       seats_by_col[col].forEach((index) => {
@@ -113,7 +118,7 @@ function group_score(seats, groups) {
     for (let i = group.from_col; i <= group.to_col; i++) {
       cols.push(i);
     }
-    var group_seats = [];
+    const group_seats = [];
     for (const seat of seats) {
       if (
         seat.col_num >= group.from_col &&
@@ -125,7 +130,7 @@ function group_score(seats, groups) {
       }
     }
 
-    var seats_by_col = {};
+    const seats_by_col = {};
     cols.forEach((col) => (seats_by_col[col.toString()] = []));
     group_seats.forEach((seat, index) =>
       seats_by_col[seat.col_num].push(index)
@@ -135,16 +140,16 @@ function group_score(seats, groups) {
       return a - b;
     });
 
-    var score = 20;
+    let score = 20;
     const mid = Math.floor((cols[0] + cols[cols.length - 1]) / 2);
-    const as = (cols.length / 2) % 1 != 0;
+    const as = (cols.length / 2) % 1 !== 0;
     for (const col of cols) {
       seats_by_col[col].forEach((index) => {
         const seat_id = group_seats[index].id;
         seats_as_object[seat_id].pass_score = score;
       });
       if (col < mid) score -= 2;
-      if (as && col == mid) score += 2;
+      if (as && col === mid) score += 2;
       if (col > mid) score += 2;
     }
   }
@@ -322,14 +327,14 @@ function getSeatsScores(seats) {
 function getGuestWithScore(guests, score) {
   const new_guests = [];
   guests.forEach((guest, index) => {
-    if (guest.score == score) new_guests.push(index);
+    if (guest.score === score) new_guests.push(index);
   });
   return new_guests;
 }
 function getSeatWithScore(seats, score) {
   const new_seats = [];
   seats.forEach((seat, index) => {
-    if (seat.score == score) new_seats.push(index);
+    if (seat.score === score) new_seats.push(index);
   });
   return new_seats;
 }
@@ -349,7 +354,7 @@ function getSeatWithTagAndScore(seats) {
   const score = getSeatsScores(seats)[0];
   const new_seats = [];
   seats.forEach((seat) => {
-    if (seat.score == score) new_seats.push(seat.index);
+    if (seat.score === score) new_seats.push(seat.index);
   });
   return new_seats;
 }
@@ -380,24 +385,10 @@ function getMap(project_name, map_name) {
   });
 }
 
-// async function getSeatsScoreByMap(project_name, map_name) {
-//     var map = await getMap(project_name, map_name);
-//     var seats_result = await getSeats(map.id);
-//     var groups_result = await getSeatsGroups(map.id);
-//     var map_seats = calculat_seats(seats_result, map, groups_result);
-//     return map_seats;
-// }
-
-router.get('/scheduling/:project_name', async (req, res) => {
-  res.set('Access-Control-Allow-Origin', req.get('origin'));
-
-  res.set({
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    Connection: 'keep-alive',
-  });
-
-  const project_id = await get_project_id(req.params.project_name);
+projectActions.scheduling = async (request_body) => {
+  check_parameters(['project_name', 'socketId'], request_body);
+  const { project_name, socketId } = request_body;
+  const project_id = await get_project_id(project_name);
 
   let seats = [];
   const matching_list = [];
@@ -433,6 +424,12 @@ router.get('/scheduling/:project_name', async (req, res) => {
   let completed_iterations = 0;
   let progress = 0;
   let i = 0;
+
+  function update_progress() {
+    wss.sendTo(socketId, { action: 'progress', progress });
+  }
+  const progressInterval = setInterval(update_progress, 500);
+
   while (seats.length !== 0 && guests.length !== 0) {
     i++;
 
@@ -465,44 +462,9 @@ router.get('/scheduling/:project_name', async (req, res) => {
     completed_iterations++;
     progress = (completed_iterations / total_iterations) * 100;
     progress = Math.round(progress);
-    res.write(`data: { "progress": ${progress} }\n\n`);
 
     await addAllMatchs([{ guest: guest_id, seat: seat_id }], project_id);
   }
-});
+};
 
-router.get('/score/:project_name/:map_name', async (req, res) => {
-  const { project_name, map_name } = req.params;
-  const seats = await getSeatsScoreByMap(project_name, map_name);
-  res.json(seats);
-});
-
-router.get('/seats_score/:project_name/:map_name', async (req, res) => {
-  const project_id = await get_project_id(req.params.project_name);
-  const { map_name } = req.params;
-  const seats = [];
-  const map = await getMap(project_id, map_name);
-  const seats_result = await getSeats(map.id);
-  const groups_result = await getSeatsGroups(map.id);
-  const tags_belongs = await getTagsBelongs(map.id);
-  let map_seats = calculat_seats(seats_result, map, groups_result);
-  map_seats = calculat_tags(map_seats, tags_belongs);
-  seats.push(...map_seats);
-  // var maps = await getMaps(project_id)
-  // for(let map of maps){
-  //     var seats_result = await getSeats(map.id)
-  //     var groups_result = await getSeatsGroups(map.id)
-  //     var tags_belongs = await getTagsBelongs(map.id)
-  //     var map_seats = calculat_seats(seats_result, map, groups_result)
-  //     map_seats = calculat_tags(map_seats, tags_belongs)
-  //     seats.push(...map_seats)
-  // }
-  // var guests_result = await getGuests(project_id)
-  // var guests_group = await getGuestsGroup(project_id)
-  // var requests = await getRequests(project_id)
-  // var guests = calculat_guests(guests_result, guests_group)
-  // guests = calculat_requests(guests, requests)
-  res.json(seats);
-});
-
-export default router;
+export default projectActions;

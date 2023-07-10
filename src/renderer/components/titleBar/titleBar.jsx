@@ -53,6 +53,7 @@ function SettingsDrop({ open }) {
       onClick: () => hive.openPopUp('server_settings'),
     },
   ];
+  if (!open) return;
   return (
     <DropDown open={open}>
       <RollingList items={settingsList} />
