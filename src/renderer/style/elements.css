@@ -14,6 +14,14 @@
     border-color: #7a8392;
     background-color: #555b66;
 }
+.group-element.selected{
+  background-color: #a2644269;
+  border-color: #b95a1b;
+}
+.group-element.selected > .resizer{
+  border-color: #b95a1b;
+  background-color: #b95a1b;
+}
 .map-element > div {
     rotate: 90;
 }

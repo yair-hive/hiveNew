@@ -165,7 +165,10 @@ function RollingList({ items, onItemClick }) {
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code === 'ArrowDown') {
-        setIndex((prevIndex) => prevIndex + 1);
+        setIndex((prevIndex) => {
+          if (items.length > prevIndex + 1) return prevIndex + 1;
+          return prevIndex;
+        });
         event.preventDefault();
       } else if (event.code === 'ArrowUp') {
         setIndex((prevIndex) => (prevIndex === 0 ? 0 : prevIndex - 1));
@@ -210,7 +213,7 @@ function RollingList({ items, onItemClick }) {
       ref={listRef}
       style={{
         maxHeight: '200px',
-        overflowY: 'scroll',
+        overflowY: 'auto',
       }}
     >
       {renderListItems()}

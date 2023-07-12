@@ -52,10 +52,11 @@ function useDelete() {
 
   const mutation = useMutation(
     (elements_ids) => {
+      const elementsIdsString = JSON.stringify(elements_ids);
       const body = {
         category: 'map_elements',
         action: 'delete',
-        elements_ids,
+        elements_ids: elementsIdsString,
       };
       return hiveFetch(body);
     },

@@ -129,6 +129,7 @@ function MapBody() {
 
   const seats_delete = api.seats.useDelete();
   const elements_delete = api.mapElements.useDelete();
+  const groups_delete = api.seatsGroups.useDelete();
 
   function getSelectedIds() {
     const selected = selection.getSelection();
@@ -266,6 +267,7 @@ function MapBody() {
     const mutations = {
       seats: seats_delete,
       elements: elements_delete,
+      groups: groups_delete,
     };
     return mutations[action](map_delete_presers[action]());
   }

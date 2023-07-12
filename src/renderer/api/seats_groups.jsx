@@ -50,8 +50,36 @@ function useCreate() {
   );
   return mutation.mutateAsync;
 }
+function useDelete() {
+  const { project_name } = useParams();
+  const hiveSocket = useSocket();
+  const hiveFetch = useHiveFetch();
+
+  const mutation = useMutation(
+    async (groups_ids) => {
+      const groupsIdsString = JSON.stringify(groups_ids);
+      const body = {
+        category: 'seats_groups',
+        action: 'delete',
+        groups_ids: groupsIdsString,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          quert_key: ['seats_groups', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
+  return mutation.mutateAsync;
+}
 
 export default {
   useData,
   useCreate,
+  useDelete,
 };

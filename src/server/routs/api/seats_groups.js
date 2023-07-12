@@ -43,7 +43,15 @@ seats_groups.get_all = async function (request_body) {
   const query_string = `SELECT * FROM seats_groups WHERE map = '${map_id}'`;
   return await db_get(query_string);
 };
-// seats_groups.delete = function (request_body) {};
+seats_groups.delete = async function (request_body) {
+  check_parameters(['groups_ids'], request_body);
+  const groups_ids = JSON.parse(request_body.groups_ids);
+  let query_string = '';
+  groups_ids.forEach((id) => {
+    query_string += `DELETE FROM seats_groups WHERE id = '${id}'`;
+  });
+  await db_post(query_string);
+};
 // seats_groups.update = function (request_body) {};
 
 export default seats_groups;
