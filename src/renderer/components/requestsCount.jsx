@@ -18,7 +18,13 @@ function RequestBox({ request_id, tag_id }) {
   if (tags.data) {
     return (
       <div className="request-box" dir="rtl">
-        <span className="delete" onClick={onClickDelete}>
+        <span
+          className="delete"
+          onClick={onClickDelete}
+          style={{
+            cursor: 'pointer',
+          }}
+        >
           x
         </span>
         <span className="text"> {tags.data[tag_id].name} </span>

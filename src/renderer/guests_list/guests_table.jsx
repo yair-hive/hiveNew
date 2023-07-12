@@ -67,6 +67,7 @@ function Table({ columns, data, dropPos, selectedGuest }) {
       getRowId(row, relativeIndex) {
         return data[relativeIndex].guest_id;
       },
+      autoResetFilters: false,
     },
     useFilters,
     useSortBy
@@ -389,6 +390,11 @@ function RequestsCell(props) {
       className="table_cell"
       tabIndex={1}
       onBlur={() => setDrop(false)}
+      style={{
+        position: 'relative',
+        maxWidth: tdRef.current?.getBoundingClientRect().width,
+        maxHeight: '20px',
+      }}
     >
       <RequestsCount value={value} />
       <div
@@ -396,6 +402,7 @@ function RequestsCell(props) {
         style={{
           position: 'relative',
           display: 'inline-block',
+          left: '50%',
           margin: 0,
         }}
       >

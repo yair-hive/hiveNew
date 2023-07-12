@@ -109,6 +109,8 @@ td > input{
 }
 td{
     padding: 0;
+    position: relative;
+    max-width: '100px'
 }
 .table_cell{
     height: 100%;
