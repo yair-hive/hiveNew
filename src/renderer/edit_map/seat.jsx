@@ -14,6 +14,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable react/prop-types */
 /* eslint-disable import/no-cycle */
+import '../style/drop_down.css';
 import { useContext, useEffect, useState, useRef } from 'react';
 import api from 'renderer/api/api';
 import TagsCount from '../components/tags_count';

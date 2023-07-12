@@ -46,7 +46,7 @@ th:hover{
     padding-left: 50px;
     padding-right: 50px;
 }
-td { 
+td {
     height: 20px;
     border: 1px solid black;
     background-color: rgb(120, 154, 216);
@@ -116,7 +116,7 @@ td{
 .text_cell{
     padding: 5px 10px;
     margin-left: 3px;
-    margin-right: 3px; 
-    padding-left: 3px; 
+    margin-right: 3px;
+    padding-left: 3px;
     padding-right: 3px;
 }

@@ -1,3 +1,7 @@
+/* eslint-disable jsx-a11y/tabindex-no-positive */
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+/* eslint-disable consistent-return */
+/* eslint-disable react/jsx-no-bind */
 /* eslint-disable react/jsx-no-constructed-context-values */
 /* eslint-disable no-plusplus */
 /* eslint-disable jsx-a11y/no-autofocus */
@@ -16,7 +20,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useSortBy, useTable } from 'react-table';
 import { useFilters } from 'react-table/dist/react-table.development';
 import api from 'renderer/api/api';
-import RequestsDrop from './requestsDrop';
+import RollingList from 'renderer/hive_elements/rolling_list';
 import {
   TableRefContext,
   BelongsContext,
@@ -30,7 +34,7 @@ import MBloader from '../hive_elements/MBloader';
 const DropPosContext = React.createContext([]);
 const SelectedGuestContext = React.createContext([]);
 
-function Table({ columns, data }) {
+function Table({ columns, data, dropPos, selectedGuest }) {
   const [page, setPage] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [TableRefState, setTableRefState] = useContext(TableRefContext);
@@ -46,6 +50,8 @@ function Table({ columns, data }) {
   const [groupsStatus, setGroupsStatus] = useContext(GroupsContext);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [belongsStatus, setBelongsStatus] = useContext(BelongsContext);
+
+  const requestsBelongs = api.requestsBelongs.useData().data;
 
   const {
     getTableProps,
@@ -72,7 +78,15 @@ function Table({ columns, data }) {
       { id: 'tags', value: tagsStatus },
       { id: 'group_name', value: groupsStatus },
     ]);
-  }, [tagsStatus, groupsStatus, belongsStatus, setAllFilters]);
+  }, [
+    belongsStatus,
+    groupsStatus,
+    setAllFilters,
+    tagsStatus,
+    dropPos,
+    selectedGuest,
+    requestsBelongs,
+  ]);
 
   const rows_num = 100;
   const slice_from = page * rows_num;
@@ -80,11 +94,18 @@ function Table({ columns, data }) {
 
   return (
     <>
-      <div className="hive_button" onClick={() => setPage(page + 1)}>
-        הבא
-      </div>
-      <div className="hive_button" onClick={() => setPage(page - 1)}>
-        הקודם
+      <div
+        style={{
+          position: 'fixed',
+          left: 0,
+        }}
+      >
+        <div className="hive_button" onClick={() => setPage(page + 1)}>
+          הבא
+        </div>
+        <div className="hive_button" onClick={() => setPage(page - 1)}>
+          הקודם
+        </div>
       </div>
       <table
         className="names_table"
@@ -309,6 +330,29 @@ function GroupNameCell(props) {
 function RequestsCell(props) {
   const { value } = props;
   const guest_id = props.cell.row.id;
+  const tags = api.tags.useData();
+  const add_request = api.requestsBelongs.useCreate();
+  const [dropStatus, setDrop] = useState(false);
+
+  function createItems() {
+    if (tags.data) {
+      const tags_array = Object.entries(tags.data);
+      const items = [];
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for (const [key, tag] of tags_array) {
+        items.push({ name: tag.name, value: tag.id });
+      }
+      return items;
+    }
+  }
+
+  function onItem(item) {
+    const data = {
+      guest_id,
+      tag_id: item.value,
+    };
+    add_request(data);
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [dropPos, setDropPos] = useContext(DropPosContext);
@@ -319,15 +363,44 @@ function RequestsCell(props) {
 
   function onClick(event) {
     const { classList } = event.target;
+    event.stopPropagation();
     if (!classList.contains('delete')) {
-      setDropPos(tdRef.current);
-      setSelectedGuest(guest_id);
+      setDrop(true);
     }
   }
 
+  if (!dropStatus)
+    return (
+      <div
+        ref={tdRef}
+        onClick={onClick}
+        className="table_cell"
+        tabIndex={1}
+        onBlur={() => setDrop(false)}
+      >
+        <RequestsCount value={value} />
+      </div>
+    );
+
   return (
-    <div ref={tdRef} onClick={onClick} className="table_cell">
+    <div
+      ref={tdRef}
+      onClick={onClick}
+      className="table_cell"
+      tabIndex={1}
+      onBlur={() => setDrop(false)}
+    >
       <RequestsCount value={value} />
+      <div
+        className="drop_down"
+        style={{
+          position: 'relative',
+          display: 'inline-block',
+          margin: 0,
+        }}
+      >
+        <RollingList items={createItems()} onItemClick={onItem} />
+      </div>
     </div>
   );
 }
@@ -390,7 +463,7 @@ function DeleteCell(props) {
     </div>
   );
 }
-function TableInstens({ data }) {
+function TableInstens({ data, dropPos, selectedGuest }) {
   const columns = React.useMemo(
     () => [
       {
@@ -443,7 +516,14 @@ function TableInstens({ data }) {
     []
   );
 
-  return <Table columns={columns} data={data} />;
+  return (
+    <Table
+      columns={columns}
+      data={data}
+      dropPos={dropPos}
+      selectedGuest={selectedGuest}
+    />
+  );
 }
 
 function GuestsTable() {
@@ -456,6 +536,15 @@ function GuestsTable() {
 
   const [dropPos, setDropPos] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
+
+  const closeDrop = () => {
+    setDropPos(null);
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', closeDrop);
+    return () => document.removeEventListener('click', closeDrop);
+  }, []);
 
   function create_rows() {
     const rows = [];
@@ -515,13 +604,11 @@ function GuestsTable() {
       <DropPosContext.Provider value={[dropPos, setDropPos]}>
         <MBloader />
         <div className="guest_table">
-          <RequestsDrop
-            pos={dropPos}
-            setPos={setDropPos}
-            selected={selectedGuest}
-            setSelected={setSelectedGuest}
+          <TableInstens
+            data={create_rows()}
+            dropPos={dropPos}
+            selectedGuest={selectedGuest}
           />
-          <TableInstens data={create_rows()} />
         </div>
       </DropPosContext.Provider>
     </SelectedGuestContext.Provider>

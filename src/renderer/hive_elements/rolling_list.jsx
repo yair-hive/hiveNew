@@ -195,7 +195,10 @@ function RollingList({ items, onItemClick }) {
           isActive={i === index}
           onMouseOver={() => handleMouseOver(i)}
           onMouseOut={handleMouseOut}
-          onClick={() => onClick(item)}
+          onClick={(event) => {
+            onClick(item);
+            event.stopPropagation();
+          }}
           setCurrentRef={setCurrentRef}
         />
       );
