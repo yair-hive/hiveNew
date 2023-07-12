@@ -251,9 +251,9 @@ function MapSideMenu() {
           <HiveSwitch
             active={map.data?.cols_to}
             options={[
-              { name: 'ימין', value: 'right' },
-              { name: 'מרכז', value: 'center' },
               { name: 'שמאל', value: 'left' },
+              { name: 'מרכז', value: 'center' },
+              { name: 'ימין', value: 'right' },
             ]}
             setActive={setColsTo}
           />

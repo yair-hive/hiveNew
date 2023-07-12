@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/tabindex-no-positive */
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable react/jsx-no-constructed-context-values */
 /* eslint-disable consistent-return */
 /* eslint-disable no-restricted-syntax */
@@ -448,10 +451,22 @@ function MapBody() {
     };
   }
 
+  let mapScale = 1;
+
   return (
     <>
       <MBloader />
-      <div className="map_container">
+      <div
+        className="map_container"
+        tabIndex={1}
+        onKeyDown={(event) => {
+          if (event.ctrlKey) {
+            if (event.code === 'Minus') mapScale -= 0.004;
+            if (event.code === 'Equal') mapScale += 0.004;
+            event.target.style.transform = `scale(${mapScale})`;
+          }
+        }}
+      >
         <Prompt id="add_tags_p" title="הוסף תגיות" setValue={setTagNameToAdd} />
         <Prompt id="hive_super" title="הוסף תגיות" setValue={setTagNameToAdd} />
         <Prompt

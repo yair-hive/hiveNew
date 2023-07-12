@@ -101,9 +101,16 @@ function useUpdate() {
     },
     {
       onSuccess: () => {
-        const msg = JSON.stringify({
+        let msg;
+        msg = JSON.stringify({
           action: 'invalidate',
           query_key: ['map', { map_name, project_name }],
+        });
+        hiveSocket.send(msg);
+
+        msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['seats', { map_name, project_name }],
         });
         hiveSocket.send(msg);
       },
