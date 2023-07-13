@@ -52,6 +52,42 @@ seats_groups.delete = async function (request_body) {
   });
   await db_post(query_string);
 };
-// seats_groups.update = function (request_body) {};
+seats_groups.update = async function (request_body) {
+  const filds = {};
+  filds.from_row = async function () {
+    check_parameters(['group_id', 'value'], request_body);
+    const { group_id } = request_body;
+    const { value } = request_body;
+    const query_string = `UPDATE seats_groups SET from_row = '${value}' WHERE id = '${group_id}'`;
+    await db_post(query_string);
+  };
+  filds.from_col = async function () {
+    check_parameters(['group_id', 'value'], request_body);
+    const { group_id } = request_body;
+    const { value } = request_body;
+    const query_string = `UPDATE seats_groups SET from_col = '${value}' WHERE id = '${group_id}'`;
+    await db_post(query_string);
+  };
+  filds.to_row = async function () {
+    check_parameters(['group_id', 'value'], request_body);
+    const { group_id } = request_body;
+    const { value } = request_body;
+    const query_string = `UPDATE seats_groups SET to_row = '${value}' WHERE id = '${group_id}'`;
+    await db_post(query_string);
+  };
+  filds.to_col = async function () {
+    check_parameters(['group_id', 'value'], request_body);
+    const { group_id } = request_body;
+    const { value } = request_body;
+    const query_string = `UPDATE seats_groups SET to_col = '${value}' WHERE id = '${group_id}'`;
+    await db_post(query_string);
+  };
+  check_parameters(['fild'], request_body);
+  const { fild } = request_body;
+  if (!filds[fild]) {
+    throw new Error('parameter missing: fild');
+  }
+  await filds[fild]();
+};
 
 export default seats_groups;
