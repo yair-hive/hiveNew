@@ -1,9 +1,8 @@
 /* eslint-disable no-new */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
-
+import Store from 'electron-store';
 import { execFile } from 'node:child_process';
 import path from 'path';
-import { readFile, writeFile } from 'fs';
 import {
   app,
   BrowserWindow,
@@ -17,6 +16,15 @@ import chalk from 'chalk';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
+const store = new Store();
+
+ipcMain.on('electron-store-get', async (event, val) => {
+  event.returnValue = store.get(val);
+});
+ipcMain.on('electron-store-set', async (event, key, val) => {
+  store.set(key, val);
+});
+
 const isDev = process.env.NODE_ENV === 'development';
 
 const RESOURCES_PATH = app.isPackaged
@@ -28,33 +36,13 @@ const getAssetPath = (...paths: string[]): string => {
 };
 
 function getSettings() {
-  return new Promise<string>((resolve) => {
-    readFile(path.join(__dirname, '../settings.json'), (err, data) => {
-      if (err) {
-        writeFile(
-          path.join(__dirname, '../settings.json'),
-          '{"serverPort":3025,"serverHost":"localhost"}',
-          () => {
-            resolve('{"serverPort":3025,"serverHost":"localhost"}');
-          }
-        );
-      }
-      if (data) resolve(data.toString());
-    });
-  });
-}
-
-// eslint-disable-next-line no-undef
-function setSettings(_event: Electron.IpcMainInvokeEvent, args: any[]) {
-  return new Promise<void>((resolve) => {
-    writeFile(path.join(__dirname, '../settings.json'), args[0], () => {
-      resolve();
-    });
-  });
+  if (!store.get('settings')) {
+    store.set('settings', { serverHost: 'localhost', serverPort: '3025' });
+  }
+  return store.get('settings');
 }
 
 ipcMain.handle('get-settings', getSettings);
-ipcMain.handle('set-settings', setSettings);
 
 function startMySql() {
   const childMySql = execFile(getAssetPath('/mysql/bin/mysqld.exe'), [

@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 export function useSettingsData() {
   return useQuery(['settings'], async () => {
     const settings = await window.electron.getSettings();
-    return JSON.parse(settings);
+    return settings;
   });
 }
 

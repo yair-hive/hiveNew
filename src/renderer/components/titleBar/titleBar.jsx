@@ -81,7 +81,7 @@ function ServerSettingsPopUp() {
     const newSettings = { ...settings.data };
     newSettings.serverHost = serverHost;
     newSettings.serverPort = serverPort;
-    await window.electron.setSettings(JSON.stringify(newSettings));
+    await window.electron.store.set('settings', newSettings);
     queryClient.invalidateQueries(['settings']);
   }
 
