@@ -35,7 +35,9 @@ function GroupFild({ groupName, groupId, setCheck }) {
   );
 }
 function downloadStringAsFile(data, exportName, fileExtension) {
-  const dataStr = `data:text/csv;charset=utf-8,${encodeURIComponent(data)}`;
+  const dataStr = `data:text/csv;charset=utf-8,${encodeURIComponent(
+    `\ufeff ${data}`
+  )}`;
   const downloadAnchorNode = document.createElement('a');
   downloadAnchorNode.setAttribute('href', dataStr);
   downloadAnchorNode.setAttribute('download', `${exportName}.${fileExtension}`);
