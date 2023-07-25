@@ -17,6 +17,7 @@ import ImportGuests from '../components/import_guests';
 import HiveButton from '../hive_elements/hive_button';
 import HiveSwitch from '../hive_elements/hive_switch';
 import { useHive } from '../app_hooks';
+import ExportPop from './export_pop';
 
 function ProjectSideMenu() {
   const navigate = useNavigate();
@@ -96,6 +97,11 @@ function GuestsSideMenu() {
       <ImportGuests status={importPop} setState={setImportPop} />
       <HiveButton onClick={() => setGroupsPop(true)}> קבוצות </HiveButton>
       <GroupsPop status={groupsPop} setState={setGroupsPop} />
+      <HiveButton onClick={() => hive.openPopUp('guestExportPop')}>
+        {' '}
+        ייצא{' '}
+      </HiveButton>
+      <ExportPop />
       <HiveSwitch
         options={['משובצים', 'לא משובצים', 'הכל']}
         active="הכל"

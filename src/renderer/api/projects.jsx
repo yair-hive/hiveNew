@@ -17,6 +17,16 @@ function useData() {
     return hiveFetch(body);
   });
 }
+function useExport() {
+  const hiveFetch = useHiveFetch();
+  return useQuery(['projects_export'], () => {
+    const body = {
+      category: 'projects',
+      action: 'export',
+    };
+    return hiveFetch(body);
+  });
+}
 function useCreate() {
   const hiveSocket = useSocket();
   const hiveFetch = useHiveFetch();
@@ -26,6 +36,32 @@ function useCreate() {
       const body = {
         category: 'projects',
         action: 'create',
+        name,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['projects'],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
+  return mutation.mutateAsync;
+}
+function useImport() {
+  const hiveSocket = useSocket();
+  const hiveFetch = useHiveFetch();
+
+  const mutation = useMutation(
+    ({ name, file }) => {
+      const body = {
+        category: 'projects',
+        action: 'import',
+        file,
         name,
       };
       return hiveFetch(body);
@@ -76,4 +112,6 @@ export default {
   useData,
   useCreate,
   useScheduling,
+  useExport,
+  useImport,
 };

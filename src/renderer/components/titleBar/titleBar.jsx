@@ -17,6 +17,7 @@ import './titleBar.css';
 import RollingList from '../../hive_elements/rolling_list';
 import AddProjectPop from '../add_project_pop';
 import { useHive } from '../../app_hooks';
+import ImportProjectPopUp from '../importProject';
 
 function ProjectsDrop({ open }) {
   const projectsData = api.projects.useData();
@@ -33,6 +34,11 @@ function ProjectsDrop({ open }) {
       name: 'הוסף פרוייקט',
       value: 'add project',
       onClick: () => hive.openPopUp('add_project'),
+    });
+    projectsList.push({
+      name: 'ייבא פרוייקט',
+      value: 'import project',
+      onClick: () => hive.openPopUp('ImportProjectPopUp'),
     });
     return (
       <RollingList
@@ -149,6 +155,7 @@ function TitleBar() {
           <ProjectsDrop open={projects} />
         </div>
         <AddProjectPop id="add_project" />
+        <ImportProjectPopUp />
       </div>
       <div className="title-line">
         {`${project_name ? `project: ${project_name} ` : ''}`}

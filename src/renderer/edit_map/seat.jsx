@@ -16,6 +16,7 @@
 /* eslint-disable import/no-cycle */
 import '../style/drop_down.css';
 import { useContext, useEffect, useState, useRef } from 'react';
+import DropDown from 'renderer/components/dropDown/dropDown';
 import api from 'renderer/api/api';
 import TagsCount from '../components/tags_count';
 import {
@@ -66,7 +67,9 @@ function Drop({ inputStr }) {
               <span
                 style={{
                   color: `${
-                    belongIds.indexOf(corrent.id) !== -1 ? '#e72a2a' : ''
+                    belongIds.indexOf(corrent.id) !== -1
+                      ? 'rgb(164, 88, 88)'
+                      : ''
                   }`,
                 }}
               >
@@ -83,16 +86,9 @@ function Drop({ inputStr }) {
   }
 
   return (
-    <div
-      className="drop_down"
-      style={{
-        position: 'relative',
-        display: 'inline-block',
-        margin: 0,
-      }}
-    >
+    <DropDown open={createMatchList().length > 0}>
       <RollingList items={createMatchList()} onItemClick={onItem} />
-    </div>
+    </DropDown>
   );
 }
 

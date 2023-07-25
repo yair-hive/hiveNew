@@ -52,7 +52,6 @@ seats.delete = async function (request_body) {
   seats_ids.forEach((id) => {
     query_string += `DELETE FROM seats WHERE id='${id}';`;
     query_string += `DELETE FROM belong WHERE seat='${id}';`;
-    query_string += `DELETE FROM seat_groups_belong WHERE seat='${id}';`;
   });
   await db_post(query_string);
 };

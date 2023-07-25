@@ -464,9 +464,29 @@ function DeleteCell(props) {
   }
 
   return (
-    <div className="td_x" onClick={on_td_x}>
-      {' '}
-      x{' '}
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <div
+        className="td_x"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '13px',
+          width: '19px',
+          height: '19px',
+        }}
+        onClick={on_td_x}
+      >
+        &#10005;
+      </div>
     </div>
   );
 }

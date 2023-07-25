@@ -512,6 +512,7 @@ function Map() {
           alignItems: 'center',
           justifyContent: 'center',
           color: 'white',
+          zIndex: 100,
         }}
       >
         <h1>{project_name}</h1>

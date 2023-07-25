@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-restricted-syntax */
@@ -30,7 +32,7 @@ function ProjectSideMenu() {
   }, [mapState, navigate, project_name]);
 
   return (
-    <div className="side_menu">
+    <>
       <HiveSwitch
         options={mapsOptions}
         active={map_name}
@@ -38,10 +40,33 @@ function ProjectSideMenu() {
         bordKey="KeyQ"
       />
       <ProjectSM />
-    </div>
+    </>
   );
 }
 
+function ColsToSwitch() {
+  const [colsTo, setColsTo] = useState(undefined);
+
+  const update_cols_to = api.maps.useUpdate().cols_to;
+
+  const map = api.maps.useData();
+
+  useEffect(() => {
+    if (colsTo) update_cols_to({ to: colsTo });
+  }, [colsTo, update_cols_to]);
+
+  return (
+    <HiveSwitch
+      active={map.data?.cols_to}
+      options={[
+        { name: 'שמאל', value: 'left' },
+        { name: 'מרכז', value: 'center' },
+        { name: 'ימין', value: 'right' },
+      ]}
+      setActive={setColsTo}
+    />
+  );
+}
 function ChangeMapName() {
   const { map_name, project_name } = useParams();
   const [new_name, setNewName] = useState(map_name);
@@ -62,47 +87,14 @@ function ChangeMapName() {
 
   return <input onChange={onChange} onBlur={onBlur} value={new_name} />;
 }
-function MapSideMenu() {
-  const navigate = useNavigate();
-  const { map_name, project_name } = useParams();
-  const [edit, setEdit] = useContext(EditContext);
-
-  const [mapState, setMap] = useState(null);
-  const maps = api.maps.useDataAll();
-
-  const mapsOptions = maps.data?.map((map) => map.map_name);
-
-  useEffect(() => {
-    if (mapState) navigate(`/maps/${project_name}/${mapState}`);
-  }, [mapState, navigate, project_name]);
+function SearchGuest() {
+  const [input_str, setInputStr] = useState('');
 
   const map = api.maps.useData();
   const seats = api.seats.useDataAll();
   const belongs = api.seatBelongs.useData();
   const guests = api.guests.useData();
   const groups = api.guestGroup.useData();
-
-  const seats_create = api.seats.useCreate();
-  const tags_create = api.tagBelongs.useCreate();
-  const numbers_update = api.seats.useUpdate().numbers;
-  const elements_create = api.mapElements.useCreate();
-  const groups_create = api.seatsGroups.useCreate();
-
-  const seats_delete = api.seats.useDelete();
-  const elements_delete = api.mapElements.useDelete();
-
-  const [input_str, setInputStr] = useState('');
-  const [tagsPopStatus, setTagsPopStatus] = useState(false);
-  const [colsTo, setColsTo] = useState(undefined);
-
-  const selecteblsState = useContext(SelectablesContext);
-  const [action, setAction] = useContext(ActionsContext);
-
-  const update_cols_to = api.maps.useUpdate().cols_to;
-
-  useEffect(() => {
-    if (colsTo) update_cols_to({ to: colsTo });
-  }, [colsTo, update_cols_to]);
 
   function guestsList() {
     function createMatchList(guests_data) {
@@ -164,6 +156,49 @@ function MapSideMenu() {
   function onInput(event) {
     setInputStr(event.target.value);
   }
+
+  return (
+    <>
+      <input type="text" onInput={onInput} />
+      <ul
+        className="results"
+        dir="rtl"
+        style={{
+          backgroundColor: 'gray',
+        }}
+      >
+        {guestsList()}
+      </ul>
+    </>
+  );
+}
+function MapSideMenu() {
+  const navigate = useNavigate();
+  const { map_name, project_name } = useParams();
+  const [edit, setEdit] = useContext(EditContext);
+
+  const [mapState, setMap] = useState(null);
+  const maps = api.maps.useDataAll();
+
+  const mapsOptions = maps.data?.map((map) => map.map_name);
+
+  useEffect(() => {
+    if (mapState) navigate(`/maps/${project_name}/${mapState}`);
+  }, [mapState, navigate, project_name]);
+
+  const seats_create = api.seats.useCreate();
+  const tags_create = api.tagBelongs.useCreate();
+  const numbers_update = api.seats.useUpdate().numbers;
+  const elements_create = api.mapElements.useCreate();
+  const groups_create = api.seatsGroups.useCreate();
+
+  const seats_delete = api.seats.useDelete();
+  const elements_delete = api.mapElements.useDelete();
+
+  const [tagsPopStatus, setTagsPopStatus] = useState(false);
+
+  const selecteblsState = useContext(SelectablesContext);
+  const [action, setAction] = useContext(ActionsContext);
 
   function map_delete() {
     const mutations = {
@@ -235,10 +270,7 @@ function MapSideMenu() {
     if (edit === 'אל תערוך') {
       return (
         <div className="sub_menu">
-          <input type="text" onInput={onInput} />
-          <ul className="results" dir="rtl">
-            {guestsList()}
-          </ul>
+          <SearchGuest />
         </div>
       );
     }
@@ -248,15 +280,6 @@ function MapSideMenu() {
       return (
         <div className="sub_menu">
           <ChangeMapName />
-          <HiveSwitch
-            active={map.data?.cols_to}
-            options={[
-              { name: 'שמאל', value: 'left' },
-              { name: 'מרכז', value: 'center' },
-              { name: 'ימין', value: 'right' },
-            ]}
-            setActive={setColsTo}
-          />
           {selecteblsSwitch()}
           {actionSwitch()}
           <HiveButton onClick={() => map_add()}> הוסף </HiveButton>
@@ -276,7 +299,7 @@ function MapSideMenu() {
   }
 
   return (
-    <div className="side_menu">
+    <>
       <HiveSwitch
         options={mapsOptions}
         active={map_name}
@@ -289,18 +312,79 @@ function MapSideMenu() {
         setActive={setEdit}
         bordKey="KeyQ"
       />
+      <ColsToSwitch />
       {editSubMenu()}
       {noEditSubMenu()}
       <ProjectSM />
-    </div>
+    </>
   );
 }
 
 function SideMenu() {
   const { map_name } = useParams();
+  const [open, setOpen] = useState(true);
 
-  if (!map_name) return <ProjectSideMenu />;
-  return <MapSideMenu />;
+  useEffect(() => {
+    const contentElement = document.getElementById('content');
+    if (!open) contentElement.style.gridTemplateColumns = '99% 1%';
+    else contentElement.style.gridTemplateColumns = '78% 22%';
+  }, [open]);
+
+  if (!map_name)
+    return (
+      <div
+        className="side_menu"
+        style={{ zIndex: 200, padding: open ? '' : '0' }}
+      >
+        <div
+          onClick={() => setOpen(!open)}
+          style={{
+            position: 'absolute',
+            backgroundColor: 'gray',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2px',
+            width: '15px',
+            height: '15px',
+            cursor: 'pointer',
+            right: open ? '22%' : '1%',
+            zIndex: 450,
+            fontSize: '15px',
+          }}
+        >
+          {open ? <span>&#10005;</span> : <span>&#60;</span>}
+        </div>
+        {open ? <ProjectSideMenu /> : ''}
+      </div>
+    );
+  return (
+    <div
+      className="side_menu"
+      style={{ zIndex: 200, padding: open ? '' : '0' }}
+    >
+      <div
+        onClick={() => setOpen(!open)}
+        style={{
+          position: 'absolute',
+          backgroundColor: 'gray',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2px',
+          width: '15px',
+          height: '15px',
+          cursor: 'pointer',
+          right: open ? '22%' : '1%',
+          zIndex: 450,
+          fontSize: '15px',
+        }}
+      >
+        {open ? <span>&#10005;</span> : <span>&#60;</span>}
+      </div>
+      {open ? <MapSideMenu /> : ''}
+    </div>
+  );
 }
 
 export default SideMenu;

@@ -136,7 +136,7 @@ function App() {
                               width: '100%',
                             }}
                           />
-                          <div className="content">
+                          <div id="content" className="content">
                             <Routes>
                               <Route path="/" element={<Home />} />
                               <Route
