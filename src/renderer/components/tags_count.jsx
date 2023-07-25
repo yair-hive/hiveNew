@@ -5,6 +5,7 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable consistent-return */
 
+import { useParams } from 'react-router-dom';
 import api from 'renderer/api/api';
 
 function getColor(backColor) {
@@ -25,6 +26,7 @@ function getColor(backColor) {
 }
 
 function TagsCount({ value }) {
+  const { map_name } = useParams();
   const tags = api.tags.useData();
   if (value) {
     if (tags.data) {
@@ -40,6 +42,9 @@ function TagsCount({ value }) {
               color,
             };
             i++;
+            if (map_name) {
+              if (map_name === tag.name) return;
+            }
             return (
               <div key={i} style={style} className="tag_box">
                 {tag.name}

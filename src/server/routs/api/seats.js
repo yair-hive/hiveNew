@@ -7,12 +7,14 @@
 /* eslint-disable func-names */
 /* eslint-disable camelcase */
 
+import { v4 as uuidv4 } from 'uuid';
 import {
   db_post,
   db_get,
   check_parameters,
   get_project_id,
   get_map_id,
+  get_tag_id,
 } from './functions.js';
 
 import getSeatsScoreByMap from '../get_seats_score.js';
@@ -25,10 +27,13 @@ seats.create = async function (request_body) {
   const { project_name } = request_body;
   const project_id = await get_project_id(project_name);
   const map_id = await get_map_id(map_name, project_name);
+  const tag_id = await get_tag_id(map_name, project_name);
   const data = JSON.parse(request_body.data);
   let query_string = '';
   data.forEach((seat) => {
-    query_string += `INSERT INTO seats(id, belong, row_num, col_num, map, project) VALUES(UUID(), '${map_id}', '${seat.row}', '${seat.col}', '${map_id}', '${project_id}');`;
+    const seatId = uuidv4();
+    query_string += `INSERT INTO seats(id, belong, row_num, col_num, map, project) VALUES('${seatId}', '${map_id}', '${seat.row}', '${seat.col}', '${map_id}', '${project_id}');`;
+    query_string += `INSERT INTO tag_belongs(id, seat, tag, map) VALUES(UUID(), '${seatId}', '${tag_id}', '${map_id}');`;
   });
   return await db_post(query_string);
 };

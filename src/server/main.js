@@ -15,7 +15,7 @@ const MySQLStore = expressMysqlSession(session);
 const app = express();
 const port = 3025;
 
-app.use(bodyParser.urlencoded({ extended: true, limit: '550kb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {

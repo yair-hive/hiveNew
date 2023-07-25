@@ -3,12 +3,14 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { useState } from 'react';
 import api from 'renderer/api/api';
+import { useHive } from 'renderer/app_hooks';
 import HiveButton from 'renderer/hive_elements/hive_button';
 import PopUp from 'renderer/hive_elements/pop_up';
 
 function ImportProjectPopUp() {
   const [file, setFile] = useState();
   const [name, setName] = useState();
+  const hive = useHive();
   const importAction = api.projects.useImport();
 
   async function onFileChange(event) {
@@ -25,7 +27,8 @@ function ImportProjectPopUp() {
   }
 
   async function onClick() {
-    importAction({ name, file });
+    await importAction({ name, file });
+    hive.closePopUp('ImportProjectPopUp');
   }
 
   return (

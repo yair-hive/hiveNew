@@ -190,7 +190,7 @@ function SeatNumberCell({ value }) {
   const backgroundColor = value ? 'green' : 'gray';
   return (
     <div style={{ backgroundColor }} className="table_cell">
-      {value}
+      {value?.seat_number}
     </div>
   );
 }
@@ -612,7 +612,7 @@ function GuestsTable() {
           last_name: guest.last_name,
           first_name: guest.first_name,
           group_name: group?.name,
-          seat_number: seat?.seat_number,
+          seat_number: seat,
           tags,
           score: Number(group_score) + Number(guest.score),
           requests: requests_object[guest.id],
