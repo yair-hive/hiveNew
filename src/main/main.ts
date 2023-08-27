@@ -37,7 +37,10 @@ const getAssetPath = (...paths: string[]): string => {
 
 function getSettings() {
   if (!store.get('settings')) {
-    store.set('settings', { serverHost: 'localhost', serverPort: '3025' });
+    store.set('settings', {
+      connections: [{ serverHost: 'localhost', serverPort: '3025' }],
+      connectionIndex: 0,
+    });
   }
   return store.get('settings');
 }

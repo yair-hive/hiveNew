@@ -176,6 +176,7 @@ function SeatNumber({ number, belong_id, fixed, score }) {
   const [showScore, setShowScore] = useContext(ShowScoreContext);
   const setFixed = api.seatBelongs.useSetFixed();
   const [fixedValue, setFixedValue] = useState(fixed);
+  const [scoreInput, setScoreInput] = useState(false);
 
   useEffect(() => {
     setFixedValue(fixed);
@@ -186,13 +187,16 @@ function SeatNumber({ number, belong_id, fixed, score }) {
     setFixedValue(!fixedValue);
   }
 
-  if (showScore)
+  if (showScore) {
+    if (scoreInput) return <input />;
     return (
       <div
         className="num_box"
         style={{ fontSize: '9px' }}
+        onClick={() => setScoreInput(true)}
       >{`r-${score.row_score} c-${score.col_score} p-${score.pass_score}`}</div>
     );
+  }
 
   if (fixedState) {
     return (

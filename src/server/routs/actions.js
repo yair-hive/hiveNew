@@ -447,9 +447,14 @@ router.get('/scheduling/:project_name', async (req, res) => {
     let height_seats = getSeatWithScore(seats, seats_scores[0]);
 
     if (guest.requests) {
-      const seats_with_tags = getSeatWithTag(seats, guest.requests[0]);
-      if (getSeatWithTagAndScore(seats_with_tags).length > 0) {
-        height_seats = getSeatWithTagAndScore(seats_with_tags);
+      console.log('שלום שמן');
+      for (let i = 0; i < guest.requests.length; i++) {
+        console.log(i);
+        const seats_with_tags = getSeatWithTag(seats, guest.requests[i]);
+        if (getSeatWithTagAndScore(seats_with_tags).length > 0) {
+          height_seats = getSeatWithTagAndScore(seats_with_tags);
+          break;
+        }
       }
     }
 

@@ -25,7 +25,16 @@ requests_belongs.create = async function (request_body) {
   let query_string = ``;
   query_string = `SELECT * FROM guests_requests WHERE guest = '${guest_id}' AND request = '${request_id}'`;
   await check_exists(query_string);
-  query_string = `INSERT INTO guests_requests(id, guest, request, project) VALUES(UUID(), '${guest_id}', '${request_id}', '${project_id}')`;
+  query_string = `SELECT * FROM guests_requests WHERE guest = '${guest_id}'`;
+  const guestRequests = await db_get(query_string);
+
+  const GRIK = guestRequests.map((req) => {
+    return req?.index_key;
+  });
+  let newIK = 1;
+  if (GRIK.length) newIK = Math.max(...GRIK) + 1;
+
+  query_string = `INSERT INTO guests_requests(id, guest, request, project, index_key) VALUES(UUID(), '${guest_id}', '${request_id}', '${project_id}', '${newIK}')`;
   await db_post(query_string);
 };
 requests_belongs.delete = async function (request_body) {
@@ -38,7 +47,7 @@ requests_belongs.get_all = async function (request_body) {
   check_parameters(['project_name'], request_body);
   const { project_name } = request_body;
   const project_id = await get_project_id(project_name);
-  const query_string = `SELECT * FROM guests_requests WHERE project = '${project_id}'`;
+  const query_string = `SELECT * FROM guests_requests WHERE project = '${project_id}' ORDER BY index_key`;
   return await db_get(query_string);
 };
 

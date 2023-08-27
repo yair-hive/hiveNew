@@ -258,7 +258,7 @@ function getSeatsGroups(map_id) {
 }
 function getTagsBelongs(map_id) {
   return new Promise((resolve, reject) => {
-    const query_string = `SELECT * FROM tag_belongs WHERE map = '${map_id}'`;
+    const query_string = `SELECT * FROM tag_belongs WHERE map = '${map_id}' ORDER BY index_key`;
     con.query(query_string, (err, result) => {
       if (err) reject(err);
       else resolve(result);
@@ -444,9 +444,12 @@ projectActions.scheduling = async (request_body) => {
     let height_seats = getSeatWithScore(seats, seats_scores[0]);
 
     if (guest.requests) {
-      const seats_with_tags = getSeatWithTag(seats, guest.requests[0]);
-      if (getSeatWithTagAndScore(seats_with_tags).length > 0) {
-        height_seats = getSeatWithTagAndScore(seats_with_tags);
+      for (let i = 0; i < guest.requests.length; i++) {
+        const seats_with_tags = getSeatWithTag(seats, guest.requests[i]);
+        if (getSeatWithTagAndScore(seats_with_tags).length > 0) {
+          height_seats = getSeatWithTagAndScore(seats_with_tags);
+          break;
+        }
       }
     }
 
