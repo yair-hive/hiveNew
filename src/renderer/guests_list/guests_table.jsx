@@ -329,11 +329,16 @@ function GroupNameCell(props) {
   );
 }
 function RequestsCell(props) {
-  const { value } = props;
+  // const { value } = props;
+  const [value, setValue] = useState(props.value);
   const guest_id = props.cell.row.id;
   const tags = api.tags.useData();
   const add_request = api.requestsBelongs.useCreate();
   const [dropStatus, setDrop] = useState(false);
+
+  useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
 
   function createItems() {
     if (tags.data) {
@@ -353,6 +358,11 @@ function RequestsCell(props) {
       tag_id: item.value,
     };
     add_request(data);
+    setValue((prev) => {
+      const the_new = [...prev];
+      the_new.push({ id: 'temp', request: item.value });
+      return the_new;
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -402,6 +412,7 @@ function RequestsCell(props) {
         style={{
           position: 'relative',
           display: 'inline-block',
+          cursor: 'pointer',
           left: '50%',
           margin: 0,
         }}
@@ -615,7 +626,7 @@ function GuestsTable() {
           seat_number: seat,
           tags,
           score: Number(group_score) + Number(guest.score),
-          requests: requests_object[guest.id],
+          requests: requests_object[guest.id] ? requests_object[guest.id] : [],
         });
       }
     }

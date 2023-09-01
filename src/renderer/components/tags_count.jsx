@@ -36,15 +36,16 @@ function TagsCount({ value }) {
           {' '}
           {value.map((tag_id) => {
             const tag = tags.data[tag_id.tag];
+            if (!tag) return;
+            if (map_name) {
+              if (map_name === tag.name) return;
+            }
             const color = getColor(tag.color);
             const style = {
               backgroundColor: tag.color,
               color,
             };
             i++;
-            if (map_name) {
-              if (map_name === tag.name) return;
-            }
             return (
               <div key={i} style={style} className="tag_box">
                 {tag.name}

@@ -258,7 +258,7 @@ function getSeatsGroups(map_id) {
 }
 function getTagsBelongs(map_id) {
   return new Promise((resolve, reject) => {
-    const query_string = `SELECT * FROM tag_belongs WHERE map = '${map_id}' ORDER BY index_key`;
+    const query_string = `SELECT * FROM tag_belongs WHERE map = '${map_id}'`;
     con.query(query_string, (err, result) => {
       if (err) reject(err);
       else resolve(result);
@@ -286,7 +286,7 @@ function getGuestsGroup(project_id) {
 }
 function getRequests(project_id) {
   return new Promise((resolve, reject) => {
-    const query_string = `SELECT * FROM guests_requests WHERE project = '${project_id}'`;
+    const query_string = `SELECT * FROM guests_requests WHERE project = '${project_id}' ORDER BY index_key`;
     con.query(query_string, (err, result) => {
       if (err) reject(err);
       else resolve(result);

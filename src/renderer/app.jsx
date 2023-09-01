@@ -71,7 +71,7 @@ function App() {
       if (data.action == 'progress') {
         setMBloader(data.progress);
         if (data.progress >= 100) data.progress = -1;
-        window.electron.sendProgress(data.progress);
+        // window.electron.sendProgress(data.progress);
       }
     };
     hiveSocket.onerror = (msg) => {

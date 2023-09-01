@@ -146,36 +146,55 @@ function MapBody() {
   }
 
   useEffect(() => {
-    if (tagNameToAdd) {
-      const selectedSeats = getSelectedIds();
-      tags_create({ seats: selectedSeats, tag_name: tagNameToAdd });
+    async function action() {
+      if (tagNameToAdd) {
+        const selectedSeats = getSelectedIds();
+        await tags_create({ seats: selectedSeats, tag_name: tagNameToAdd });
+        setTagNameToAdd(false);
+      }
     }
+    action();
   }, [tagNameToAdd]);
   useEffect(() => {
-    if (elementNameToAdd) {
-      const selectedBounds = getSelectedBounds();
-      elements_create({ element_name: elementNameToAdd, ...selectedBounds });
+    async function action() {
+      if (elementNameToAdd) {
+        const selectedBounds = getSelectedBounds();
+        await elements_create({
+          element_name: elementNameToAdd,
+          ...selectedBounds,
+        });
+        setElementNameToAdd(false);
+      }
     }
+    action();
   }, [elementNameToAdd]);
   useEffect(() => {
-    if (groupNameToAdd) {
-      const selectedBounds = getSelectedBounds();
-      groups_create({ group_name: groupNameToAdd, ...selectedBounds });
+    async function action() {
+      if (groupNameToAdd) {
+        const selectedBounds = getSelectedBounds();
+        await groups_create({ group_name: groupNameToAdd, ...selectedBounds });
+        setGroupToAdd(false);
+      }
     }
+    action();
   }, [groupNameToAdd]);
   useEffect(() => {
-    if (seatNumberToAdd) {
-      const col_name = seatNumberToAdd;
-      let seatNumber = Number(col_name) + 1;
-      const elements = selection.getSelection();
-      const data = [];
-      for (const element of elements) {
-        const seat_id = element.getAttribute('seat_id');
-        data.push({ id: seat_id, number: seatNumber });
-        seatNumber++;
+    async function action() {
+      if (seatNumberToAdd) {
+        const col_name = seatNumberToAdd;
+        let seatNumber = Number(col_name) + 1;
+        const elements = selection.getSelection();
+        const data = [];
+        for (const element of elements) {
+          const seat_id = element.getAttribute('seat_id');
+          data.push({ id: seat_id, number: seatNumber });
+          seatNumber++;
+        }
+        await numbers_update({ data });
+        setSeatNumberToAdd(false);
       }
-      numbers_update({ data });
     }
+    action();
   }, [seatNumberToAdd]);
 
   if (edit === 'ערוך') {

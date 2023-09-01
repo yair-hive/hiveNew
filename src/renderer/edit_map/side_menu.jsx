@@ -184,7 +184,8 @@ function MapSideMenu() {
 
   useEffect(() => {
     if (mapState) navigate(`/maps/${project_name}/${mapState}`);
-  }, [mapState, navigate, project_name]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapState, project_name]);
 
   const seats_create = api.seats.useCreate();
   const tags_create = api.tagBelongs.useCreate();
