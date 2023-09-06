@@ -135,7 +135,10 @@ function ListItem({
       className={`rolling-list-item ${isActive ? 'active' : ''}`}
       onMouseOver={onMouseOver}
       onMouseOut={onMouseOut}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
     >
       {item.name}
     </li>
@@ -198,9 +201,8 @@ function RollingList({ items, onItemClick }) {
           isActive={i === index}
           onMouseOver={() => handleMouseOver(i)}
           onMouseOut={handleMouseOut}
-          onClick={(event) => {
+          onClick={() => {
             onClick(item);
-            event.stopPropagation();
           }}
           setCurrentRef={setCurrentRef}
         />

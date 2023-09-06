@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 export function useSettingsData() {
   return useQuery(['settings'], async () => {
     // const settings = await window.electron.getSettings();
-    // return settings.connections[0];
+    // return settings;
     return { serverHost: 'localhost', serverPort: '3025' };
   });
 }
@@ -28,12 +28,13 @@ function useHiveFetch() {
     }
     return stringsArray.join('&');
   }
+  // eslint-disable-next-line consistent-return
   return async function hiveFetch(body) {
     const localOptions = { ...options };
     localOptions.body = convertToFormType(body);
     const res = await fetch(apiUrl, localOptions);
     const jsonRes = await res.json();
-    if (jsonRes.msg !== 'ok') throw new Error(jsonRes.msg);
+    if (jsonRes.msg !== 'ok') console.log(jsonRes.msg);
     else return jsonRes.data;
   };
 }

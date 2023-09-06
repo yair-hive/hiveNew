@@ -2,14 +2,14 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useContext, useEffect, useState } from 'react';
-import { useDownloadExcel } from 'react-export-table-to-excel';
+// import { useDownloadExcel } from 'react-export-table-to-excel';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from 'renderer/api/api';
 import {
   BelongsContext,
   GroupsContext,
   TagsContext,
-  TableRefContext,
+  // TableRefContext,
 } from '../app';
 import AddGuest from '../components/add_guest';
 import GroupsPop from '../components/groups_pop';
@@ -47,15 +47,15 @@ function ProjectSideMenu() {
 function GuestsSideMenu() {
   const delete_all_guests = api.guests.useDeleteAll();
   const hive = useHive();
-  const { map_name } = useParams();
+  // const { map_name } = useParams();
 
-  const [TableRefState] = useContext(TableRefContext);
+  // const [TableRefState] = useContext(TableRefContext);
 
-  const { onDownload } = useDownloadExcel({
-    currentTableRef: TableRefState,
-    filename: map_name,
-    sheet: '1',
-  });
+  // const { onDownload } = useDownloadExcel({
+  //   currentTableRef: TableRefState,
+  //   filename: map_name,
+  //   sheet: '1',
+  // });
   const [importPop, setImportPop] = useState(false);
   const [groupsPop, setGroupsPop] = useState(false);
   const setBelongsStatus = useContext(BelongsContext)[1];
@@ -124,7 +124,7 @@ function GuestsSideMenu() {
         bordKey="KeyB"
       />
 
-      <HiveButton onClick={onDownload}> ייצא </HiveButton>
+      {/* <HiveButton onClick={onDownload}> ייצא </HiveButton> */}
     </div>
   );
 }

@@ -32,7 +32,12 @@ app.get('/test', async (req, res) => {
   res.send(maps);
 });
 app.use('/actions', actionsRouter);
-app.use('/api', api);
+
+try {
+  app.use('/api', api);
+} catch (error) {
+  console.error(error);
+}
 
 const options = {
   host: 'localhost',

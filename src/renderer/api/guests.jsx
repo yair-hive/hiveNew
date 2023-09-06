@@ -138,7 +138,7 @@ function useUpdate() {
       onSuccess: () => {
         const msg = JSON.stringify({
           action: 'invalidate',
-          query_key: ['guests', project_name],
+          query_key: ['guests', { project_name }],
         });
         hiveSocket.send(msg);
       },
@@ -159,7 +159,7 @@ function useUpdate() {
       onSuccess: () => {
         const msg = JSON.stringify({
           action: 'invalidate',
-          query_key: ['guests', project_name],
+          query_key: ['guests', { project_name }],
         });
         hiveSocket.send(msg);
       },
@@ -181,7 +181,7 @@ function useUpdate() {
       onSuccess: () => {
         const msg = JSON.stringify({
           action: 'invalidate',
-          query_key: ['guests', project_name],
+          query_key: ['guests', { project_name }],
         });
         hiveSocket.send(msg);
       },
@@ -202,7 +202,7 @@ function useUpdate() {
       onSuccess: () => {
         const msg = JSON.stringify({
           action: 'invalidate',
-          query_key: ['guests', project_name],
+          query_key: ['guests', { project_name }],
         });
         hiveSocket.send(msg);
       },

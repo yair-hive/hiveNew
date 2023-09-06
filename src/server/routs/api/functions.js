@@ -43,7 +43,9 @@ export function check_exists(query_string) {
     con.query(query_string, (err, result) => {
       if (err) reject(err);
       else if (result.length !== 0) {
-        throw new Error('exists');
+        // throw new Error('exists');
+        // eslint-disable-next-line prefer-promise-reject-errors
+        reject('ex');
       } else resolve(result);
     });
   });
