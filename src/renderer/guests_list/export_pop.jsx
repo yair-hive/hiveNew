@@ -51,6 +51,7 @@ function convertToCsv(data) {
   return `${header}\n${values}`;
 }
 function ExportPop() {
+  const [showGroupsSelect, setShowGroupsSelect] = useState(true);
   const guestGroups = api.guestGroup.useData();
   const seats = api.seats.useDataAll();
   const belongs = api.seatBelongs.useData();
@@ -163,6 +164,15 @@ function ExportPop() {
     }
     return 'טוען';
   }
+  let groupsAllIds;
+  if (guestGroups.data) {
+    const groupsArray = Object.entries(guestGroups.data).map(
+      ([, value]) => value
+    );
+    groupsAllIds = groupsArray.map((group) => {
+      return group.id;
+    });
+  }
   return (
     <PopUp id="guestExportPop">
       <form dir="rtl">
@@ -200,7 +210,24 @@ function ExportPop() {
         </div>
         <br />
         <label> שיעורים </label>
-        {renderGroups()}
+        <HiveButton
+          onClick={() => {
+            if (groupsAllIds) {
+              if (showGroupsSelect) {
+                setCheck(groupsAllIds);
+                setShowGroupsSelect(false);
+              } else {
+                setCheck([]);
+                setShowGroupsSelect(true);
+              }
+            }
+          }}
+          active={!showGroupsSelect}
+        >
+          {' '}
+          בחר הכל{' '}
+        </HiveButton>
+        {showGroupsSelect ? renderGroups() : ''}
         <HiveButton
           onClick={() => {
             downloadStringAsFile(

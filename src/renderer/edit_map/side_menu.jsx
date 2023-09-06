@@ -280,6 +280,7 @@ function MapSideMenu() {
     if (edit === 'ערוך') {
       return (
         <div className="sub_menu">
+          <ColsToSwitch />
           <ChangeMapName />
           {selecteblsSwitch()}
           {actionSwitch()}
@@ -313,10 +314,10 @@ function MapSideMenu() {
         setActive={setEdit}
         bordKey="KeyQ"
       />
-      <ColsToSwitch />
       {editSubMenu()}
       {noEditSubMenu()}
       <ProjectSM />
+      <HiveButton onClick={() => window.print()}> הדפס </HiveButton>
     </>
   );
 }

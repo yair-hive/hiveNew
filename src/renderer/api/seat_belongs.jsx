@@ -51,7 +51,7 @@ function useCreate() {
       },
     }
   );
-  return mutation.mutate;
+  return mutation.mutateAsync;
 }
 function useDelete() {
   const { project_name } = useParams();

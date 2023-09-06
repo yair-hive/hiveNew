@@ -4,7 +4,12 @@ export function useSettingsData() {
   return useQuery(['settings'], async () => {
     // const settings = await window.electron.getSettings();
     // return settings;
-    return { serverHost: 'localhost', serverPort: '3025' };
+    // return { serverHost: 'localhost', serverPort: '3025' };
+    if (!localStorage.getItem('settings')) {
+      const settings = { serverHost: 'localhost', serverPort: '3025' };
+      localStorage.setItem('settings', JSON.stringify(settings));
+    }
+    return JSON.parse(localStorage.getItem('settings'));
   });
 }
 

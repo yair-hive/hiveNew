@@ -162,6 +162,7 @@ function get_project_id(project_name) {
   return new Promise((resolve, reject) => {
     const query_string = `SELECT * FROM projects WHERE name='${project_name}'`;
     con.query(query_string, (err, map_result) => {
+      // console.log(map_result);
       if (err) reject(err);
       else resolve(map_result[0].id);
     });

@@ -82,6 +82,7 @@ function ServerSettingsPopUp() {
     newSettings.serverHost = serverHost;
     newSettings.serverPort = serverPort;
     queryClient.setQueriesData('settings', newSettings);
+    localStorage.setItem('settings', JSON.stringify(newSettings));
     // await window.electron.store.set('settings', newSettings);
     // queryClient.invalidateQueries(['settings']);
   }
@@ -158,9 +159,9 @@ function TitleBar() {
         <AddProjectPop id="add_project" />
         <ImportProjectPopUp />
       </div>
-      <div className="title-line">
-        {`${project_name ? `project: ${project_name} ` : ''}`}
-        {`${map_name ? `| map: ${map_name} ` : ''}`}
+      <div className="title-line" dir="rtl">
+        {`${project_name ? `פרוייקט : ${project_name} ` : ''}`}
+        {`${map_name ? `| מפה : ${map_name} ` : ''}`}
       </div>
     </div>
   );

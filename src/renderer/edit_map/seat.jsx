@@ -45,12 +45,15 @@ function Drop({ inputStr }) {
   });
 
   async function onItem(item) {
+    // eslint-disable-next-line promise/catch-or-return
     add_guest({
       guest_id: item.value,
       seat_id: dropDownPos,
+      // eslint-disable-next-line promise/always-return
+    }).then(() => {
+      setDropDownPos(null);
+      setSelectedSeat(null);
     });
-    setDropDownPos(null);
-    setSelectedSeat(null);
   }
 
   function createMatchList() {

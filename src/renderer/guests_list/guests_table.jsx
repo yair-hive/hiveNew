@@ -357,7 +357,10 @@ function RequestsCell(props) {
       guest_id,
       tag_id: item.value,
     };
-    add_request(data);
+    // eslint-disable-next-line promise/catch-or-return, promise/always-return
+    add_request(data).then(() => {
+      setDrop(false);
+    });
     setValue((prev) => {
       const the_new = [...prev];
       the_new.push({ id: 'temp', request: item.value });

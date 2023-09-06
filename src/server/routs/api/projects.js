@@ -18,10 +18,14 @@ import {
 const projects = {};
 
 projects.create = async function (request_body) {
-  check_parameters(['name'], request_body);
-  const name = request_body.name;
-  const query_string = `INSERT INTO projects (id, name) VALUES (UUID(), '${name}')`;
-  await db_post(query_string);
+  check_parameters(['name', 'password'], request_body);
+  const password = request_body.password;
+
+  if (password === '2233') {
+    const name = request_body.name;
+    const query_string = `INSERT INTO projects (id, name) VALUES (UUID(), '${name}')`;
+    await db_post(query_string);
+  }
 };
 projects.get = async function () {
   var query_string = 'SELECT * FROM projects';
@@ -135,7 +139,7 @@ projects.import = async function (request_body) {
       const requestId = newIds[request.id];
       const requestValueId = newIds[request.request];
       const guestId = newIds[request.guest];
-      const query_string = `INSERT INTO guests_requests(id, guest, request, project) VALUES('${requestId}', '${guestId}', '${requestValueId}', '${newProjectId}')`;
+      const query_string = `INSERT INTO guests_requests(id, guest, request, project, index_key) VALUES('${requestId}', '${guestId}', '${requestValueId}', '${newProjectId}', '${request.index_key}')`;
       await db_post(query_string);
     }
   }

@@ -32,11 +32,12 @@ function useCreate() {
   const hiveFetch = useHiveFetch();
 
   const mutation = useMutation(
-    (name) => {
+    ({ name, password }) => {
       const body = {
         category: 'projects',
         action: 'create',
         name,
+        password,
       };
       return hiveFetch(body);
     },
