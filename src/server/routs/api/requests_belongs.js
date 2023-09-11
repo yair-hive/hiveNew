@@ -40,8 +40,15 @@ requests_belongs.create = async function (request_body) {
 requests_belongs.delete = async function (request_body) {
   check_parameters(['request_id'], request_body);
   const { request_id } = request_body;
+  const request = await db_get(
+    `SELECT * FROM guests_requests WHERE id = '${request_id}'`
+  );
+
   const query_string = `DELETE FROM guests_requests WHERE id = '${request_id}'`;
   await db_post(query_string);
+  await db_post(
+    `UPDATE guests_requests SET index_key = index_key -1 WHERE guest = '${request[0].guest}' AND index_key > ${request[0].index_key}`
+  );
 };
 requests_belongs.get_all = async function (request_body) {
   check_parameters(['project_name'], request_body);

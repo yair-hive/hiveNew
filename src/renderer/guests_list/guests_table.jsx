@@ -20,7 +20,8 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useSortBy, useTable } from 'react-table';
 import { useFilters } from 'react-table/dist/react-table.development';
 import api from 'renderer/api/api';
-import RollingList from 'renderer/hive_elements/rolling_list';
+// import RollingList from 'renderer/hive_elements/rolling_list';
+import HiveButton from 'renderer/hive_elements/hive_button';
 import {
   TableRefContext,
   BelongsContext,
@@ -28,11 +29,13 @@ import {
   TagsContext,
 } from '../app';
 import TagsCount from '../components/tags_count';
-import RequestsCount from '../components/requestsCount';
+// import RequestsCount from '../components/requestsCount';
 import MBloader from '../hive_elements/MBloader';
+import RequestsPopUp from './requests_pop_up';
 
 const DropPosContext = React.createContext([]);
 const SelectedGuestContext = React.createContext([]);
+export const RequestsCurrentGuestContest = React.createContext();
 
 function Table({ columns, data, dropPos, selectedGuest }) {
   const [page, setPage] = useState(0);
@@ -330,99 +333,106 @@ function GroupNameCell(props) {
 }
 function RequestsCell(props) {
   // const { value } = props;
-  const [value, setValue] = useState(props.value);
+  // const [value, setValue] = useState(props.value);
   const guest_id = props.cell.row.id;
-  const tags = api.tags.useData();
-  const add_request = api.requestsBelongs.useCreate();
-  const [dropStatus, setDrop] = useState(false);
+  const [, setRequestsCurrentGuset] = useContext(RequestsCurrentGuestContest);
+  // const tags = api.tags.useData();
+  // const add_request = api.requestsBelongs.useCreate();
+  // const [dropStatus, setDrop] = useState(false);
 
-  useEffect(() => {
-    setValue(props.value);
-  }, [props.value]);
+  // useEffect(() => {
+  //   setValue(props.value);
+  // }, [props.value]);
 
-  function createItems() {
-    if (tags.data) {
-      const tags_array = Object.entries(tags.data);
-      const items = [];
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      for (const [key, tag] of tags_array) {
-        items.push({ name: tag.name, value: tag.id });
-      }
-      return items;
-    }
-  }
+  // function createItems() {
+  //   if (tags.data) {
+  //     const tags_array = Object.entries(tags.data);
+  //     const items = [];
+  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //     for (const [key, tag] of tags_array) {
+  //       items.push({ name: tag.name, value: tag.id });
+  //     }
+  //     return items;
+  //   }
+  // }
 
-  function onItem(item) {
-    const data = {
-      guest_id,
-      tag_id: item.value,
-    };
-    // eslint-disable-next-line promise/catch-or-return, promise/always-return
-    add_request(data).then(() => {
-      setDrop(false);
-    });
-    setValue((prev) => {
-      const the_new = [...prev];
-      the_new.push({ id: 'temp', request: item.value });
-      return the_new;
-    });
-  }
+  // function onItem(item) {
+  //   const data = {
+  //     guest_id,
+  //     tag_id: item.value,
+  //   };
+  //   // eslint-disable-next-line promise/catch-or-return, promise/always-return
+  //   add_request(data).then(() => {
+  //     setDrop(false);
+  //   });
+  //   setValue((prev) => {
+  //     const the_new = [...prev];
+  //     the_new.push({ id: 'temp', request: item.value });
+  //     return the_new;
+  //   });
+  // }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [dropPos, setDropPos] = useContext(DropPosContext);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedGuest, setSelectedGuest] = useContext(SelectedGuestContext);
+  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const [dropPos, setDropPos] = useContext(DropPosContext);
+  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const [selectedGuest, setSelectedGuest] = useContext(SelectedGuestContext);
 
-  const tdRef = useRef(null);
+  // const tdRef = useRef(null);
 
-  function onClick(event) {
-    const { classList } = event.target;
-    event.stopPropagation();
-    if (!classList.contains('delete')) {
-      setDrop(true);
-    }
-  }
+  // function onClick(event) {
+  //   const { classList } = event.target;
+  //   event.stopPropagation();
+  //   if (!classList.contains('delete')) {
+  //     setDrop(true);
+  //   }
+  // }
 
-  if (!dropStatus)
-    return (
-      <div
-        ref={tdRef}
-        onClick={onClick}
-        className="table_cell"
-        tabIndex={1}
-        onBlur={() => setDrop(false)}
-      >
-        <RequestsCount value={value} />
-      </div>
-    );
+  // if (!dropStatus)
+  //   return (
+  //     <div
+  //       ref={tdRef}
+  //       onClick={onClick}
+  //       className="table_cell"
+  //       tabIndex={1}
+  //       onBlur={() => setDrop(false)}
+  //     >
+  //       <RequestsCount value={value} />
+  //     </div>
+  //   );
 
+  // return (
+  //   <div
+  //     ref={tdRef}
+  //     onClick={onClick}
+  //     className="table_cell"
+  //     tabIndex={1}
+  //     onBlur={() => setDrop(false)}
+  //     style={{
+  //       position: 'relative',
+  //       maxWidth: tdRef.current?.getBoundingClientRect().width,
+  //       maxHeight: '20px',
+  //     }}
+  //   >
+  //     <RequestsCount value={value} />
+  //     <div
+  //       className="drop_down"
+  //       style={{
+  //         position: 'relative',
+  //         display: 'inline-block',
+  //         cursor: 'pointer',
+  //         left: '50%',
+  //         margin: 0,
+  //       }}
+  //     >
+  //       <RollingList items={createItems()} onItemClick={onItem} />
+  //     </div>
+  //   </div>
+  // );
   return (
-    <div
-      ref={tdRef}
-      onClick={onClick}
-      className="table_cell"
-      tabIndex={1}
-      onBlur={() => setDrop(false)}
-      style={{
-        position: 'relative',
-        maxWidth: tdRef.current?.getBoundingClientRect().width,
-        maxHeight: '20px',
-      }}
-    >
-      <RequestsCount value={value} />
-      <div
-        className="drop_down"
-        style={{
-          position: 'relative',
-          display: 'inline-block',
-          cursor: 'pointer',
-          left: '50%',
-          margin: 0,
-        }}
-      >
-        <RollingList items={createItems()} onItemClick={onItem} />
-      </div>
-    </div>
+    <HiveButton onClick={() => setRequestsCurrentGuset(guest_id)}>
+      {' '}
+      פתח{' '}
+    </HiveButton>
   );
 }
 function ScoreCell(props) {
@@ -577,6 +587,7 @@ function GuestsTable() {
 
   const [dropPos, setDropPos] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
+  const [requestsCurrentGuset, setRequestsCurrentGuset] = useState();
 
   const closeDrop = () => {
     setDropPos(null);
@@ -633,7 +644,25 @@ function GuestsTable() {
         });
       }
     }
-    return rows;
+    // rows = rows.sort((a, b) => {
+    //   const groupComper = a.group_name - b.group_name;
+    //   if (groupComper) return groupComper;
+    //   const lastNameComper = a.last_name - b.last_name;
+    //   if (lastNameComper) return lastNameComper;
+    //   const firstNameComper = a.first_name - b.first_name;
+    //   if (firstNameComper) return firstNameComper;
+    //   return 0;
+    // });
+    // return rows;
+    return rows.sort((a, b) => {
+      const groupComper = a.group_name.localeCompare(b.group_name);
+      if (groupComper) return groupComper;
+      const lastNameComper = a.last_name.localeCompare(b.last_name);
+      if (lastNameComper) return lastNameComper;
+      const firstNameComper = a.first_name.localeCompare(b.first_name);
+      if (firstNameComper) return firstNameComper;
+      return 0;
+    });
   }
 
   // if(guests.isLoading || belongs.isLoading || groups.isLoading || seats.isLoading || tags_belongs.isLoading || requests.isLoading) setStatus(101)
@@ -644,13 +673,18 @@ function GuestsTable() {
     <SelectedGuestContext.Provider value={[selectedGuest, setSelectedGuest]}>
       <DropPosContext.Provider value={[dropPos, setDropPos]}>
         <MBloader />
-        <div className="guest_table">
-          <TableInstens
-            data={create_rows()}
-            dropPos={dropPos}
-            selectedGuest={selectedGuest}
-          />
-        </div>
+        <RequestsCurrentGuestContest.Provider
+          value={[requestsCurrentGuset, setRequestsCurrentGuset]}
+        >
+          <div className="guest_table">
+            <TableInstens
+              data={create_rows()}
+              dropPos={dropPos}
+              selectedGuest={selectedGuest}
+            />
+          </div>
+          <RequestsPopUp />
+        </RequestsCurrentGuestContest.Provider>
       </DropPosContext.Provider>
     </SelectedGuestContext.Provider>
   );

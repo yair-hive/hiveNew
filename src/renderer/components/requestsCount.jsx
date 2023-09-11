@@ -8,7 +8,7 @@ import api from 'renderer/api/api';
 import './requests_count.css';
 import { useState } from 'react';
 
-function RequestBox({ request_id, tag_id }) {
+export function RequestBox({ request_id, tag_id }) {
   const tags = api.tags.useData();
   const [active, setActive] = useState(true);
   const delete_request = api.requestsBelongs.useDelete();
@@ -34,7 +34,7 @@ function RequestBox({ request_id, tag_id }) {
             cursor: 'pointer',
           }}
         >
-          x
+          &#10005;
         </span>
         <span className="text"> {tags.data[tag_id].name} </span>
       </div>

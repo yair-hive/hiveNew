@@ -17,6 +17,7 @@ import TagsPop from './tags_pop';
 import ProjectSM from '../pages/projects_sub_menu';
 import { map_add_presers } from './map_add_presers';
 import { map_delete_presers } from './map_delete_presers';
+// import MapsList from './side_menu/maps_list';
 
 function ProjectSideMenu() {
   const navigate = useNavigate();
@@ -318,6 +319,7 @@ function MapSideMenu() {
       {noEditSubMenu()}
       <ProjectSM />
       <HiveButton onClick={() => window.print()}> הדפס </HiveButton>
+      {/* <MapsList /> */}
     </>
   );
 }
