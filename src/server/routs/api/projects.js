@@ -115,7 +115,7 @@ projects.import = async function (request_body) {
   async function createMaps(maps) {
     for (const map of maps) {
       const mapId = newIds[map.id];
-      const query_string = `INSERT INTO maps(id, map_name, rows_number, columns_number, project) VALUES('${mapId}', '${map.map_name}', '${map.rows_number}', '${map.columns_number}', '${newProjectId}')`;
+      const query_string = `INSERT INTO maps(id, map_name, rows_number, columns_number, cols_to, project) VALUES('${mapId}', '${map.map_name}', '${map.rows_number}', '${map.columns_number}', '${map.cols_to}', '${newProjectId}')`;
       await db_post(query_string);
     }
   }
@@ -123,7 +123,7 @@ projects.import = async function (request_body) {
     for (const guest of guests) {
       const guestId = newIds[guest.id];
       const groupId = newIds[guest.guest_group];
-      const query_string = `INSERT INTO guests(id, first_name, last_name, guest_group, project) VALUES('${guestId}', '${guest.first_name}', '${guest.last_name}', '${groupId}', '${newProjectId}');`;
+      const query_string = `INSERT INTO guests(id, first_name, last_name, guest_group, score, project) VALUES('${guestId}', '${guest.first_name}', '${guest.last_name}', '${groupId}', '${guest.score}', '${newProjectId}');`;
       await db_post(query_string);
     }
   }
@@ -164,7 +164,7 @@ projects.import = async function (request_body) {
     for (const seat of seats) {
       const seatId = newIds[seat.id];
       const mapId = newIds[seat.belong];
-      const query_string = `INSERT INTO seats(id, belong, row_num, col_num, map, project) VALUES('${seatId}', '${mapId}', '${seat.row_num}', '${seat.col_num}', '${mapId}', '${newProjectId}');`;
+      const query_string = `INSERT INTO seats(id, belong, row_num, col_num, seat_number, map, project) VALUES('${seatId}', '${mapId}', '${seat.row_num}', '${seat.col_num}', '${seat.seat_number}', '${mapId}', '${newProjectId}');`;
       await db_post(query_string);
     }
   }
@@ -180,8 +180,8 @@ projects.import = async function (request_body) {
   async function createSeatsGroups(seatsGroups) {
     for (const group of seatsGroups) {
       const groupId = newIds[group.id];
-      const mapId = newIds[group.belong];
-      const query_string = `INSERT INTO seats_groups(id, name, from_row, from_col, to_row, to_col, map) VALUES('${groupId}', '${group.group_name}', '${group.from_row}', '${group.from_col}', '${group.to_row}', '${group.to_col}', '${mapId}')`;
+      const mapId = newIds[group.map];
+      const query_string = `INSERT INTO seats_groups(id, name, from_row, from_col, to_row, to_col, map) VALUES('${groupId}', '${group.name}', '${group.from_row}', '${group.from_col}', '${group.to_row}', '${group.to_col}', '${mapId}')`;
       await db_post(query_string);
     }
   }
