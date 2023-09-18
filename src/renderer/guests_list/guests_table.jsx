@@ -478,6 +478,49 @@ function ScoreCell(props) {
     </div>
   );
 }
+function AmountCell(props) {
+  const initialValue = props.value;
+  const guest_id = props.cell.row.id;
+
+  const [isAmountInput, setAmountInput] = useState(false);
+  const [amount, setAmount] = useState(initialValue);
+  const updateAmount = api.guests.useUpdate().amount;
+
+  useEffect(() => setAmount(initialValue), [initialValue]);
+
+  function onTdClick() {
+    setAmountInput(true);
+  }
+  function onInputBlur() {
+    updateAmount({ guest_id, amount });
+    setAmountInput(false);
+  }
+
+  function onInputChange(event) {
+    setAmount(Number(event.target.value));
+  }
+
+  if (isAmountInput) {
+    return (
+      <input
+        type="text"
+        autoFocus
+        value={amount}
+        onBlur={onInputBlur}
+        onChange={onInputChange}
+        style={{
+          width: `${amount.toString().length}ch`,
+        }}
+      />
+    );
+  }
+
+  return (
+    <div onClick={onTdClick} className="text_cell">
+      {amount}
+    </div>
+  );
+}
 function DeleteCell(props) {
   const guest_id = props.cell.row.id;
 
@@ -555,6 +598,11 @@ function TableInstens({ data, dropPos, selectedGuest }) {
         Header: 'ניקוד',
         accessor: 'score',
         Cell: ScoreCell,
+      },
+      {
+        Header: 'כמות',
+        accessor: 'number_of_seats',
+        Cell: AmountCell,
       },
       {
         Header: 'בקשות',
@@ -645,6 +693,7 @@ function GuestsTable() {
           group_name: group?.name,
           seat_number: seat,
           tags,
+          number_of_seats: guest.number_of_seats,
           score: Number(group_score) + Number(guest.score),
           requests: requests_object[guest.id] ? requests_object[guest.id] : [],
         });

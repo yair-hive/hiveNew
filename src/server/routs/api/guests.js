@@ -150,6 +150,12 @@ guests.update = async function (request_body) {
     const query_string = `UPDATE guests SET score = '${score}' WHERE id = '${guest_id}'`;
     await db_post(query_string);
   };
+  filds.amount = async function () {
+    check_parameters(['guest_id', 'amount'], request_body);
+    const { guest_id, amount } = request_body;
+    const query_string = `UPDATE guests SET number_of_seats = '${amount}' WHERE id = '${guest_id}'`;
+    await db_post(query_string);
+  };
   check_parameters(['fild'], request_body);
   const { fild } = request_body;
   if (!filds[fild]) {

@@ -210,11 +210,33 @@ function useUpdate() {
       },
     }
   );
+  const amountMutation = useMutation(
+    ({ guest_id, amount }) => {
+      const body = {
+        category: 'guests',
+        action: 'update',
+        fild: 'amount',
+        guest_id,
+        amount,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['guests', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
   return {
     last: lastMutation.mutate,
     first: firstMutation.mutate,
     group: groupMutation.mutate,
     score: scoreMutation.mutate,
+    amount: amountMutation.mutate,
   };
 }
 
