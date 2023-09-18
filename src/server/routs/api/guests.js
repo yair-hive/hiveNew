@@ -30,6 +30,15 @@ async function getGuestGroupScore(guest_id) {
   const group = await db_get(query_string);
   return group[0].score;
 }
+async function getGuestGroupScoreByIdNumber(id_number) {
+  let query_string = '';
+  query_string = `SELECT * FROM guests WHERE id_number = '${id_number}'`;
+  const guest = await db_get(query_string);
+  const { guest_group } = guest[0];
+  query_string = `SELECT * FROM guests_groups WHERE id = '${guest_group}'`;
+  const group = await db_get(query_string);
+  return group[0].score;
+}
 
 guests.create = async function (request_body) {
   check_parameters(['guests', 'project_name', 'socketId'], request_body);
@@ -117,6 +126,26 @@ guests.delete_all = async function (request_body) {
 };
 guests.update = async function (request_body) {
   const filds = {};
+  filds.active = async function () {
+    check_parameters(['guest_id', 'active'], request_body);
+    const { guest_id } = request_body;
+    let { active } = request_body;
+    active = active === 'true' ? 1 : 0;
+    const query_string = `UPDATE guests SET active = '${active}' WHERE id = '${guest_id}'`;
+    await db_post(query_string);
+  };
+  filds.activeByIdNumber = async function () {
+    check_parameters(['id_number', 'active'], request_body);
+    const { id_number } = request_body;
+    const { active, project } = request_body;
+    const project_id = await get_project_id(project);
+    const query_string = `UPDATE guests SET active = '${active}' WHERE id_number = '${id_number}' AND project ='${project_id}'`;
+    await db_post(query_string);
+    wss.sendToAll({
+      action: 'invalidate',
+      query_key: ['guests', { project_name: project }],
+    });
+  };
   filds.first = async function () {
     check_parameters(['guest_id', 'first_name'], request_body);
     const { guest_id } = request_body;
@@ -148,6 +177,15 @@ guests.update = async function (request_body) {
     const group_score = await getGuestGroupScore(guest_id);
     score = Number(score) - Number(group_score);
     const query_string = `UPDATE guests SET score = '${score}' WHERE id = '${guest_id}'`;
+    await db_post(query_string);
+  };
+  filds.scoreByIbNumber = async function () {
+    check_parameters(['id_number', 'score'], request_body);
+    const { id_number } = request_body;
+    let { score } = request_body;
+    const group_score = await getGuestGroupScoreByIdNumber(id_number);
+    score = Number(score) - Number(group_score);
+    const query_string = `UPDATE guests SET score = '${score}' WHERE id_number = '${id_number}'`;
     await db_post(query_string);
   };
   filds.amount = async function () {

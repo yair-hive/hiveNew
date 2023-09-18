@@ -59,6 +59,13 @@ tags.update = async function (request_body) {
     const query_string = `UPDATE tags SET score = '${score}' WHERE  id = '${tag_id}'`;
     await db_post(query_string);
   };
+  filds.code = async function () {
+    check_parameters(['code', 'tag_id'], request_body);
+    const { code } = request_body;
+    const { tag_id } = request_body;
+    const query_string = `UPDATE tags SET code = '${code}' WHERE  id = '${tag_id}'`;
+    await db_post(query_string);
+  };
   check_parameters(['fild'], request_body);
   const { fild } = request_body;
   if (!filds[fild]) {

@@ -76,6 +76,49 @@ function ColorCell({ value, cell }) {
     <input type="color" value={value} onChange={onChange} onBlur={onBlur} />
   );
 }
+function CodeCell(props) {
+  const initialValue = props.value;
+  const tag_id = props.cell.row.id;
+
+  const [isCodeInput, setCodeInput] = useState(false);
+  const [code, setCode] = useState(initialValue);
+  const updateCode = api.tags.useUpdate().code;
+
+  useEffect(() => setCode(initialValue), [initialValue]);
+
+  function onTdClick() {
+    setCodeInput(true);
+  }
+  function onInputBlur() {
+    updateCode({ tag_id, code });
+    setCodeInput(false);
+  }
+
+  function onInputChange(event) {
+    setCode(Number(event.target.value));
+  }
+
+  if (isCodeInput) {
+    return (
+      <input
+        type="text"
+        autoFocus
+        value={code}
+        onBlur={onInputBlur}
+        onChange={onInputChange}
+        style={{
+          width: `${code.toString().length}ch`,
+        }}
+      />
+    );
+  }
+
+  return (
+    <div onClick={onTdClick} className="text_cell">
+      {code}
+    </div>
+  );
+}
 function DeleteCell({ cell }) {
   const tag_id = cell.row.id;
 
@@ -152,6 +195,11 @@ function TableInstens({ data }) {
         Header: 'x',
         accessor: 'x',
         Cell: DeleteCell,
+      },
+      {
+        Header: 'קוד',
+        accessor: 'code',
+        Cell: CodeCell,
       },
       {
         Header: 'צבע',

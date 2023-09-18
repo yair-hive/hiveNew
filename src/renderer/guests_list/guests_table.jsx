@@ -603,6 +603,48 @@ function DeleteCell(props) {
     </div>
   );
 }
+function ActiveCell(props) {
+  const [active, setActive] = useState(props.value);
+  const updateActive = api.guests.useUpdate().active;
+  const guest_id = props.cell.row.id;
+
+  useEffect(() => setActive(props.value), [props.value]);
+  if (active)
+    return (
+      <div
+        style={{
+          backgroundColor: 'rebeccapurple',
+          height: '100%',
+          width: '100%',
+          cursor: 'pointer',
+        }}
+        onClick={() => {
+          updateActive({ active: !active, guest_id });
+          setActive(!active);
+        }}
+      >
+        {' '}
+        כן{' '}
+      </div>
+    );
+  return (
+    <div
+      style={{
+        height: '100%',
+        width: '100%',
+        cursor: 'pointer',
+      }}
+      onClick={() => {
+        setActive(!active);
+        updateActive({ active: !active, guest_id });
+      }}
+    >
+      {' '}
+      לא{' '}
+    </div>
+  );
+  // return props.value;
+}
 function TableInstens({ data, dropPos, selectedGuest }) {
   const columns = React.useMemo(
     () => [
@@ -611,6 +653,12 @@ function TableInstens({ data, dropPos, selectedGuest }) {
         accessor: 'seat_number',
         Cell: SeatNumberCell,
         filter: filterBelongs,
+      },
+      {
+        Header: 'פעיל',
+        accessor: 'active',
+        Cell: ActiveCell,
+        // filter: filterBelongs,
       },
       {
         Header: 'תגיות',
@@ -739,6 +787,7 @@ function GuestsTable() {
         const group_score = group ? group.score : 0;
         rows.push({
           guest_id: guest.id,
+          active: guest.active === 1,
           id_number: guest.id_number,
           last_name: guest.last_name,
           first_name: guest.first_name,

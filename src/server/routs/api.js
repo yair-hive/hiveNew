@@ -57,4 +57,28 @@ router.post('/', async (req, res) => {
     res.status(500).json({ msg: false, data: error });
   }
 });
+router.get('/', async (req, res) => {
+  const { category, action } = req.query;
+  try {
+    if (!category || !action) {
+      throw new Error('parameter misseng');
+    }
+    if (category.length === 0 || action.length === 0) {
+      throw new Error('parameter misseng');
+    }
+    if (!actions[category]) {
+      throw new Error('category dont exists');
+    }
+    if (!actions[category][action]) {
+      throw new Error('action dont exists');
+    }
+    const respons = {
+      data: await actions[category][action](req.query, req),
+      msg: 'ok',
+    };
+    res.json(respons);
+  } catch (error) {
+    res.status(500).json({ msg: false, data: error });
+  }
+});
 export default router;

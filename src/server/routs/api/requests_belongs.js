@@ -12,15 +12,28 @@ import {
   check_exists,
   check_parameters,
   get_project_id,
+  guestIdFromNumber,
+  tagIdFromNumber,
 } from './functions.js';
 
 const requests_belongs = {};
 
 requests_belongs.create = async function (request_body) {
-  check_parameters(['guest_id', 'tag_id', 'project_name'], request_body);
-  const { guest_id } = request_body;
-  const request_id = request_body.tag_id;
+  check_parameters(['project_name'], request_body);
   const { project_name } = request_body;
+  let guest_id;
+  if (request_body.id_number) {
+    guest_id = await guestIdFromNumber(request_body.id_number);
+  } else {
+    guest_id = request_body.guest_id;
+  }
+  let request_id;
+  if (request_body.tag_code) {
+    request_id = await tagIdFromNumber(request_body.tag_code, project_name);
+  } else {
+    request_id = request_body.tag_id;
+  }
+
   const project_id = await get_project_id(project_name);
   let query_string = ``;
   query_string = `SELECT * FROM guests_requests WHERE guest = '${guest_id}' AND request = '${request_id}'`;

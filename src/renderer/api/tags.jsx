@@ -118,11 +118,33 @@ function useUpdate() {
       },
     }
   );
+  const code_mutation = useMutation(
+    ({ tag_id, code }) => {
+      const body = {
+        category: 'tags',
+        action: 'update',
+        fild: 'code',
+        tag_id,
+        code,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['tags', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
 
   return {
     name: name_mutation.mutate,
     color: color_mutation.mutate,
     score: score_mutation.mutate,
+    code: code_mutation.mutate,
   };
 }
 

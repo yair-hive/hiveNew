@@ -71,6 +71,17 @@ export async function get_project_id(project_name) {
   const result = await db_get(query_string);
   return await result[0].id;
 }
+export async function guestIdFromNumber(id_number) {
+  const query_string = `SELECT id FROM guests WHERE id_number = '${id_number}'`;
+  const result = await db_get(query_string);
+  return await result[0].id;
+}
+export async function tagIdFromNumber(code, project_name) {
+  const project_id = await get_project_id(project_name);
+  const query_string = `SELECT id FROM tags WHERE code = '${code}' AND project = '${project_id}'`;
+  const result = await db_get(query_string);
+  return await result[0].id;
+}
 export async function get_map_id(map_name, project_name) {
   const project_id = await get_project_id(project_name);
   const query_string = `SELECT id FROM maps WHERE map_name = '${map_name}' AND project = '${project_id}'`;

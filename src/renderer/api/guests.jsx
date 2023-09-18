@@ -125,6 +125,27 @@ function useUpdate() {
   const hiveFetch = useHiveFetch();
   const hiveSocket = useSocket();
 
+  const activeMutation = useMutation(
+    ({ guest_id, active }) => {
+      const body = {
+        category: 'guests',
+        action: 'update',
+        fild: 'active',
+        guest_id,
+        active,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['guests', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
   const lastMutation = useMutation(
     ({ guest_id, last_name }) => {
       const body = {
@@ -253,6 +274,7 @@ function useUpdate() {
     }
   );
   return {
+    active: activeMutation.mutate,
     last: lastMutation.mutate,
     first: firstMutation.mutate,
     group: groupMutation.mutate,

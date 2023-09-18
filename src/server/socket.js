@@ -26,5 +26,10 @@ wss.on('error', (err) => console.log(err));
 wss.sendTo = (id, data) => {
   wss.connections[id].send(JSON.stringify(data));
 };
+wss.sendToAll = (data) => {
+  wss.clients.forEach((client) => {
+    client.send(JSON.stringify(data));
+  });
+};
 
 export default wss;
