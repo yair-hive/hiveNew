@@ -12,6 +12,8 @@ import PopUp from '../hive_elements/pop_up';
 
 function ImportGuests(props) {
   const [file, setFile] = useState();
+  const [importSeatNumber, setImportSeatNumber] = useState();
+  const [importIdNumber, setImportIdNumber] = useState();
   const create_guests = api.guests.useCreate();
 
   function onChange(event) {
@@ -20,7 +22,7 @@ function ImportGuests(props) {
 
   async function onClick() {
     const rows = await readXlsxFile(file);
-    create_guests(rows);
+    create_guests({ guestsData: rows, importSeatNumber, importIdNumber });
     props.setState(false);
   }
 
@@ -31,6 +33,20 @@ function ImportGuests(props) {
         <label> בחר קובץ אקסאל </label>
         <br />
         <input onChange={onChange} type="file" accept=".xls,.xlsx" />
+        <br />
+        <input
+          name="importSeatNumber"
+          type="checkbox"
+          onChange={() => setImportSeatNumber(!importSeatNumber)}
+        />
+        <label htmlFor="importSeatNumbeer"> ייבא מספרי כיסאות </label>
+        <br />
+        <input
+          name="importIdNumber"
+          type="checkbox"
+          onChange={() => setImportIdNumber(!importIdNumber)}
+        />
+        <label htmlFor="importIdNumbeer"> ייבא מספרי תעודת זהות </label>
         <br />
         <HiveButton onClick={onClick}> ייבא </HiveButton>
       </form>

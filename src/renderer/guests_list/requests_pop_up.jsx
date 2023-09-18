@@ -1,13 +1,20 @@
+/* eslint-disable react/jsx-no-bind */
+/* eslint-disable camelcase */
+/* eslint-disable consistent-return */
+/* eslint-disable no-inner-declarations */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable import/no-cycle */
 import PopUp from 'renderer/hive_elements/pop_up';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import api from 'renderer/api/api';
 import { useTable, useSortBy } from 'react-table';
 import { RequestBox } from 'renderer/components/requestsCount';
+import HiveButton from 'renderer/hive_elements/hive_button';
+import RollingList from 'renderer/hive_elements/rolling_list';
 import { RequestsCurrentGuestContest } from './guests_table';
 
 function RequestsTable({ data, columns }) {
@@ -104,6 +111,9 @@ function DeleteCell() {
 }
 function RequestsPopUp() {
   const requests = api.requestsBelongs.useData();
+  const tags = api.tags.useData();
+  const add_request = api.requestsBelongs.useCreate();
+  const [dropStatus, setDrop] = useState(false);
   const [requestsCurrentGuset, setRequestsCurrentGuset] = useContext(
     RequestsCurrentGuestContest
   );
@@ -136,12 +146,92 @@ function RequestsPopUp() {
     requests.data.forEach((request) =>
       requestsObject[request.guest].push(request)
     );
+
+    function createItems() {
+      if (tags.data) {
+        const tags_array = Object.entries(tags.data);
+        const items = [];
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (const [key, tag] of tags_array) {
+          items.push({ name: tag.name, value: tag.id });
+        }
+        return items;
+      }
+    }
+
+    function onItem(item) {
+      const data = {
+        guest_id: requestsCurrentGuset,
+        tag_id: item.value,
+      };
+      // eslint-disable-next-line promise/catch-or-return, promise/always-return
+      add_request(data).then(() => {
+        setDrop(false);
+      });
+    }
+    if (!requestsObject[requestsCurrentGuset]) {
+      return (
+        <PopUp status={requestsCurrentGuset} setState={setRequestsCurrentGuset}>
+          <div>
+            <HiveButton active> הוסף </HiveButton>
+            <div
+              className="drop_down"
+              style={{
+                // position: 'relative'
+                position: 'absolute',
+                display: 'inline-block',
+                cursor: 'pointer',
+                margin: 0,
+              }}
+            >
+              {tags ? (
+                <RollingList items={createItems()} onItemClick={onItem} />
+              ) : (
+                ''
+              )}
+            </div>
+          </div>
+        </PopUp>
+      );
+    }
+    if (!dropStatus) {
+      return (
+        <PopUp status={requestsCurrentGuset} setState={setRequestsCurrentGuset}>
+          <div>
+            <RequestsTable
+              data={requestsObject[requestsCurrentGuset]}
+              columns={columns}
+            />
+            <HiveButton onClick={() => setDrop(true)}> הוסף </HiveButton>
+          </div>
+        </PopUp>
+      );
+    }
     return (
       <PopUp status={requestsCurrentGuset} setState={setRequestsCurrentGuset}>
-        <RequestsTable
-          data={requestsObject[requestsCurrentGuset]}
-          columns={columns}
-        />
+        <div>
+          <RequestsTable
+            data={requestsObject[requestsCurrentGuset]}
+            columns={columns}
+          />
+          <HiveButton active> הוסף </HiveButton>
+          <div
+            className="drop_down"
+            style={{
+              // position: 'relative'
+              position: 'absolute',
+              display: 'inline-block',
+              cursor: 'pointer',
+              margin: 0,
+            }}
+          >
+            {tags ? (
+              <RollingList items={createItems()} onItemClick={onItem} />
+            ) : (
+              ''
+            )}
+          </div>
+        </div>
       </PopUp>
     );
   }

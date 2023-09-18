@@ -531,6 +531,11 @@ function TableInstens({ data, dropPos, selectedGuest }) {
         disableSortBy: true,
       },
       {
+        Header: 'ת.ז',
+        accessor: 'id_number',
+        disableSortBy: true,
+      },
+      {
         Header: 'שם משפחה',
         accessor: 'last_name',
         Cell: LastNameCell,
@@ -634,6 +639,7 @@ function GuestsTable() {
         const group_score = group ? group.score : 0;
         rows.push({
           guest_id: guest.id,
+          id_number: guest.id_number,
           last_name: guest.last_name,
           first_name: guest.first_name,
           group_name: group?.name,

@@ -26,12 +26,14 @@ function useCreate() {
   const hiveSocket = useSocket();
 
   const mutation = useMutation(
-    (guestsData) => {
+    ({ guestsData, importSeatNumber, importIdNumber }) => {
       const guestsDataString = JSON.stringify(guestsData);
       const body = {
         category: 'guests',
         action: 'create',
         guests: guestsDataString,
+        importSeatNumber,
+        importIdNumber,
         project_name,
         socketId,
       };
