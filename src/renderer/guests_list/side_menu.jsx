@@ -61,6 +61,7 @@ function GuestsSideMenu() {
   const setBelongsStatus = useContext(BelongsContext)[1];
   const setGroupsStatus = useContext(GroupsContext)[1];
   const setTagsStatus = useContext(TagsContext)[1];
+  const updateAllActive = api.guests.useUpdate().activeAll;
 
   const groups = api.guestGroup.useData();
   const tags = api.tags.useData();
@@ -123,6 +124,14 @@ function GuestsSideMenu() {
         setActive={setTagsStatus}
         bordKey="KeyB"
       />
+      <HiveButton onClick={() => updateAllActive(true)}>
+        {' '}
+        סמן כולם כפעילים{' '}
+      </HiveButton>
+      <HiveButton onClick={() => updateAllActive(false)}>
+        {' '}
+        סמן כולם כלא פעילים{' '}
+      </HiveButton>
 
       {/* <HiveButton onClick={onDownload}> ייצא </HiveButton> */}
     </div>

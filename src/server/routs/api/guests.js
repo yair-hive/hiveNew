@@ -134,6 +134,14 @@ guests.update = async function (request_body) {
     const query_string = `UPDATE guests SET active = '${active}' WHERE id = '${guest_id}'`;
     await db_post(query_string);
   };
+  filds.activeAll = async function () {
+    check_parameters(['project_name'], request_body);
+    const project_id = await get_project_id(request_body.project_name);
+    let { active } = request_body;
+    active = active === 'true' ? 1 : 0;
+    const query_string = `UPDATE guests SET active = '${active}' WHERE project = '${project_id}'`;
+    await db_post(query_string);
+  };
   filds.activeByIdNumber = async function () {
     check_parameters(['id_number', 'active'], request_body);
     const { id_number } = request_body;

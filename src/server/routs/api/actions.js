@@ -389,7 +389,7 @@ function getTags(project_id) {
     const query_string = `SELECT * FROM tags WHERE project = '${project_id}';`;
     con.query(query_string, (err, result) => {
       if (err) reject(err);
-      else resolve(result[0]);
+      else resolve(result);
     });
   });
 }
@@ -416,17 +416,21 @@ projectActions.scheduling = async (request_body) => {
   const tags = await getTags(project_id);
 
   const tagsAsObject = {};
+  console.log(tags);
   tags.forEach((tag) => {
     tagsAsObject[tag.id] = tag;
   });
-
   const [belogs_by_guest, belong_by_seat] =
     calculat_seats_belongs(seats_belongs);
 
   guests_result = guests_result.filter((guest) => {
-    return belogs_by_guest[guest.id] !== 1;
+    console.log(guest.active);
+    return guest.active === 1;
   });
 
+  guests_result = guests_result.filter((guest) => {
+    return belogs_by_guest[guest.id] !== 1;
+  });
   seats = seats.filter((seat) => {
     return belong_by_seat[seat.id] !== 1;
   });

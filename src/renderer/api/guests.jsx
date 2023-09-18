@@ -146,6 +146,27 @@ function useUpdate() {
       },
     }
   );
+  const activeAllMutation = useMutation(
+    (active) => {
+      const body = {
+        category: 'guests',
+        action: 'update',
+        fild: 'activeAll',
+        project_name,
+        active,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['guests', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
   const lastMutation = useMutation(
     ({ guest_id, last_name }) => {
       const body = {
@@ -275,6 +296,7 @@ function useUpdate() {
   );
   return {
     active: activeMutation.mutate,
+    activeAll: activeAllMutation.mutate,
     last: lastMutation.mutate,
     first: firstMutation.mutate,
     group: groupMutation.mutate,
