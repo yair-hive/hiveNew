@@ -197,6 +197,9 @@ function SeatNumberCell({ value }) {
     </div>
   );
 }
+function IdNumberCell({ value }) {
+  return <div style={{ padding: '5px' }}> {value} </div>;
+}
 function LastNameCell(props) {
   const initialValue = props.value;
   const guest_id = props.cell.row.id;
@@ -521,6 +524,49 @@ function AmountCell(props) {
     </div>
   );
 }
+function NotesCell(props) {
+  const initialValue = props.value;
+  const guest_id = props.cell.row.id;
+
+  const [isNotesInput, setNotesInput] = useState(false);
+  const [notes, setNotes] = useState(initialValue);
+  const updateNotes = api.guests.useUpdate().notes;
+
+  useEffect(() => setNotes(initialValue), [initialValue]);
+
+  function onTdClick() {
+    setNotesInput(true);
+  }
+  function onInputBlur() {
+    updateNotes({ guest_id, notes });
+    setNotesInput(false);
+  }
+
+  function onInputChange(event) {
+    setNotes(event.target.value);
+  }
+
+  if (isNotesInput) {
+    return (
+      <input
+        type="text"
+        autoFocus
+        value={notes}
+        onBlur={onInputBlur}
+        onChange={onInputChange}
+        style={{
+          width: `${notes.length}ch`,
+        }}
+      />
+    );
+  }
+
+  return (
+    <div onClick={onTdClick} className="text_cell">
+      {notes}
+    </div>
+  );
+}
 function DeleteCell(props) {
   const guest_id = props.cell.row.id;
 
@@ -577,6 +623,7 @@ function TableInstens({ data, dropPos, selectedGuest }) {
         Header: 'ת.ז',
         accessor: 'id_number',
         disableSortBy: true,
+        Cell: IdNumberCell,
       },
       {
         Header: 'שם משפחה',
@@ -609,6 +656,11 @@ function TableInstens({ data, dropPos, selectedGuest }) {
         accessor: 'requests',
         Cell: RequestsCell,
         disableSortBy: true,
+      },
+      {
+        Header: 'הערות',
+        accessor: 'notes',
+        Cell: NotesCell,
       },
       {
         Header: 'x',
@@ -694,6 +746,7 @@ function GuestsTable() {
           seat_number: seat,
           tags,
           number_of_seats: guest.number_of_seats,
+          notes: guest.notes,
           score: Number(group_score) + Number(guest.score),
           requests: requests_object[guest.id] ? requests_object[guest.id] : [],
         });

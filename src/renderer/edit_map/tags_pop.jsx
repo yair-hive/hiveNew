@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/destructuring-assignment */
@@ -6,7 +7,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable camelcase */
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSortBy, useTable } from 'react-table';
 import api from 'renderer/api/api';
 import PopUp from '../hive_elements/pop_up';
@@ -14,8 +15,48 @@ import PopUp from '../hive_elements/pop_up';
 function TagNameCell({ value }) {
   return <div className="text_cell"> {value} </div>;
 }
-function ScoreCell({ value }) {
-  return <div className="text_cell"> {value} </div>;
+function ScoreCell(props) {
+  const initialValue = props.value;
+  const tag_id = props.cell.row.id;
+
+  const [isScoreInput, setScoreInput] = useState(false);
+  const [score, setScore] = useState(initialValue);
+  const update_score = api.tags.useUpdate().score;
+
+  useEffect(() => setScore(initialValue), [initialValue]);
+
+  function onTdClick() {
+    setScoreInput(true);
+  }
+  function onInputBlur() {
+    update_score({ tag_id, score });
+    setScoreInput(false);
+  }
+
+  function onInputChange(event) {
+    setScore(Number(event.target.value));
+  }
+
+  if (isScoreInput) {
+    return (
+      <input
+        type="text"
+        autoFocus
+        value={score}
+        onBlur={onInputBlur}
+        onChange={onInputChange}
+        style={{
+          width: `${score.toString().length}ch`,
+        }}
+      />
+    );
+  }
+
+  return (
+    <div onClick={onTdClick} className="text_cell">
+      {score}
+    </div>
+  );
 }
 function ColorCell({ value, cell }) {
   const tag_id = cell.row.id;

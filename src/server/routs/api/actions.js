@@ -384,7 +384,15 @@ function getMap(project_name, map_name) {
     });
   });
 }
-
+function getTags(project_id) {
+  return new Promise(async (resolve, reject) => {
+    const query_string = `SELECT * FROM tags WHERE project = '${project_id}';`;
+    con.query(query_string, (err, result) => {
+      if (err) reject(err);
+      else resolve(result[0]);
+    });
+  });
+}
 projectActions.scheduling = async (request_body) => {
   check_parameters(['project_name', 'socketId'], request_body);
   const { project_name, socketId } = request_body;
@@ -405,6 +413,12 @@ projectActions.scheduling = async (request_body) => {
   const seats_belongs = await getSeatsBelongs(project_id);
   const guests_group = await getGuestsGroup(project_id);
   const requests = await getRequests(project_id);
+  const tags = await getTags(project_id);
+
+  const tagsAsObject = {};
+  tags.forEach((tag) => {
+    tagsAsObject[tag.id] = tag;
+  });
 
   const [belogs_by_guest, belong_by_seat] =
     calculat_seats_belongs(seats_belongs);
@@ -415,6 +429,15 @@ projectActions.scheduling = async (request_body) => {
 
   seats = seats.filter((seat) => {
     return belong_by_seat[seat.id] !== 1;
+  });
+
+  seats = seats.map((seat) => {
+    let tagsScore = 0;
+    seat.tags.forEach((tag) => {
+      tagsScore += tagsAsObject[tag].score;
+    });
+    seat.score += tagsScore;
+    return seat;
   });
 
   let guests = calculat_guests(guests_result, guests_group);
@@ -440,6 +463,10 @@ projectActions.scheduling = async (request_body) => {
     const guest = guests[random_guest_index];
     const guest_id = guest.id;
 
+    if (guest.number_of_seats > 1) {
+      guests.splice(random_guest_index, 1);
+      continue;
+    }
     const seats_scores = getSeatsScores(seats);
     let height_seats = getSeatWithScore(seats, seats_scores[0]);
 

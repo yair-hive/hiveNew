@@ -54,7 +54,7 @@ tags.update = async function (request_body) {
   };
   filds.score = async function () {
     check_parameters(['score', 'tag_id'], request_body);
-    const score = request_body.sscore;
+    const { score } = request_body;
     const { tag_id } = request_body;
     const query_string = `UPDATE tags SET score = '${score}' WHERE  id = '${tag_id}'`;
     await db_post(query_string);

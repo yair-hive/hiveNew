@@ -196,13 +196,60 @@ function getMap(project_name, map_name) {
     });
   });
 }
+function calculat_tags(seats, tags) {
+  const tags_as_object = {};
+  tags.forEach((tag) => (tags_as_object[tag.seat] = []));
+  tags.forEach((tag) => tags_as_object[tag.seat].push(tag.tag));
+  return seats.map((seat) => {
+    if (tags_as_object[seat.id]) seat.tags = tags_as_object[seat.id];
+    return seat;
+  });
+}
+function getTagsBelongs(map_id) {
+  return new Promise((resolve, reject) => {
+    const query_string = `SELECT * FROM tag_belongs WHERE map = '${map_id}'`;
+    con.query(query_string, (err, result) => {
+      if (err) reject(err);
+      else resolve(result);
+    });
+  });
+}
+function getTags(project_name) {
+  return new Promise(async (resolve, reject) => {
+    const project_id = await get_project_id(project_name);
+    const query_string = `SELECT * FROM tags WHERE project = '${project_id}';`;
+    con.query(query_string, (err, result) => {
+      if (err) reject(err);
+      else resolve(result);
+    });
+  });
+}
 
 async function getSeatsScoreByMap(project_name, map_name) {
   const map = await getMap(project_name, map_name);
   const seats_result = await getSeats(map.id);
   const groups_result = await getSeatsGroups(map.id);
-  const map_seats = calculat_seats(seats_result, map, groups_result);
-  return map_seats;
+  const tags_belongs = await getTagsBelongs(map.id);
+
+  const tags = await getTags(project_name);
+
+  const tagsAsObject = {};
+  tags.forEach((tag) => {
+    tagsAsObject[tag.id] = tag;
+  });
+
+  let map_seats = calculat_seats(seats_result, map, groups_result);
+  map_seats = calculat_tags(map_seats, tags_belongs);
+
+  const seats = map_seats.map((seat) => {
+    let tagsScore = 0;
+    seat.tags.forEach((tag) => {
+      tagsScore += tagsAsObject[tag].score;
+    });
+    seat.score += tagsScore;
+    return seat;
+  });
+  return seats;
 }
 
 export default getSeatsScoreByMap;

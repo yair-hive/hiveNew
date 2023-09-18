@@ -231,12 +231,34 @@ function useUpdate() {
       },
     }
   );
+  const notesMutation = useMutation(
+    ({ guest_id, notes }) => {
+      const body = {
+        category: 'guests',
+        action: 'update',
+        fild: 'notes',
+        guest_id,
+        notes,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['guests', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
   return {
     last: lastMutation.mutate,
     first: firstMutation.mutate,
     group: groupMutation.mutate,
     score: scoreMutation.mutate,
     amount: amountMutation.mutate,
+    notes: notesMutation.mutate,
   };
 }
 
