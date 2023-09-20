@@ -60,5 +60,17 @@ seat_belongs.set_fixed = async function (request_body) {
   const query_string = `UPDATE belong SET fixed = '${value}' WHERE id = '${id}'`;
   return await db_get(query_string);
 };
+seat_belongs.set_fixed_all = async function (request_body) {
+  check_parameters(['belongIds', 'value'], request_body);
+  const belongIds = JSON.parse(request_body.belongIds);
+  let { value } = request_body;
+  if (value === 'true') value = 1;
+  if (value === 'false') value = 0;
+  let query_string = '';
+  for (const id of belongIds) {
+    query_string += `UPDATE belong SET fixed = '${value}' WHERE id = '${id}';`;
+  }
+  return await db_get(query_string);
+};
 
 export default seat_belongs;

@@ -224,6 +224,7 @@ function Seat({ seat }) {
   const [selectebls] = useContext(SelectablesContext);
   const [action, setAction] = useContext(ActionsContext);
   const [selectedRC, setSelectedRC] = useContext(SelectedRCcontext);
+  const [fixedState, setfixedState] = useContext(FixedContext);
 
   const belongs = api.seatBelongs.useData();
   const guests = api.guests.useData();
@@ -290,6 +291,8 @@ function Seat({ seat }) {
   if (seat.in_group && action === 'groups' && edit === 'ערוך')
     var selectable_class = '';
 
+  if (fixedState) var selectable_class = ' selectable';
+
   const class_name = `seat${selectable_class}${selected_class}`;
 
   return (
@@ -299,6 +302,7 @@ function Seat({ seat }) {
         seat_id={seat.id}
         cell-row={seat.row_num}
         cell-col={seat.col_num}
+        belong_id={belong_id}
       >
         <SeatNumber
           number={seat.seat_number}

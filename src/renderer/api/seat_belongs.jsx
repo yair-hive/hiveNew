@@ -98,7 +98,34 @@ function useSetFixed() {
       onSuccess: () => {
         const msg = JSON.stringify({
           action: 'invalidate',
-          quert_key: ['belongs', { project_name }],
+          query_key: ['belongs', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
+  return mutation.mutate;
+}
+function useSetFixedAll() {
+  const { project_name } = useParams();
+  const hiveSocket = useSocket();
+  const hiveFetch = useHiveFetch();
+
+  const mutation = useMutation(
+    async ({ belongIds, value }) => {
+      const body = {
+        category: 'seat_belongs',
+        action: 'set_fixed_all',
+        belongIds,
+        value,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['belongs', { project_name }],
         });
         hiveSocket.send(msg);
       },
@@ -112,4 +139,5 @@ export default {
   useCreate,
   useDelete,
   useSetFixed,
+  useSetFixedAll,
 };

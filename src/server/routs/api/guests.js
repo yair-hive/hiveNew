@@ -203,7 +203,7 @@ guests.update = async function (request_body) {
     await db_post(query_string);
   };
   filds.notes = async function () {
-    check_parameters(['guest_id', 'notes'], request_body);
+    check_parameters(['guest_id'], request_body);
     const { guest_id, notes } = request_body;
     const query_string = `UPDATE guests SET notes = '${notes}' WHERE id = '${guest_id}'`;
     await db_post(query_string);

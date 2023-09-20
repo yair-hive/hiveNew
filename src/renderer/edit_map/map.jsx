@@ -17,7 +17,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api from 'renderer/api/api';
 import { useHive } from '../app_hooks';
-import { ActionsContext, EditContext, MBloaderContext } from '../app';
+import {
+  ActionsContext,
+  EditContext,
+  MBloaderContext,
+  FixedContext,
+} from '../app';
 import Cell from './cell';
 import './map_cont.css';
 import '../style/side_menu.css';
@@ -73,6 +78,7 @@ function MapSelection({ children }) {
 }
 
 function MapBody() {
+  const [fixedState] = useContext(FixedContext);
   const map = api.maps.useData();
   const seats = api.seats.useData();
   const elements = api.mapElements.useData();
@@ -128,6 +134,7 @@ function MapBody() {
   const numbers_update = api.seats.useUpdate().numbers;
   const elements_create = api.mapElements.useCreate();
   const groups_create = api.seatsGroups.useCreate();
+  const setFixedAll = api.seatBelongs.useSetFixedAll();
   const map_update = api.maps.useUpdate();
 
   const seats_delete = api.seats.useDelete();
@@ -143,6 +150,20 @@ function MapBody() {
       seats.push(seat_id);
     }
     return seats;
+  }
+
+  function setFixed(value) {
+    function getBelongIds() {
+      const selected = selection.getSelection();
+      const seatsBelongs = [];
+      for (let i = 0; i < selected.length; i++) {
+        const seat = selected[i];
+        const seatBelong = seat.getAttribute('belong_id');
+        if (seatBelong.length > 0) seatsBelongs.push(seatBelong);
+      }
+      return seatsBelongs;
+    }
+    setFixedAll({ belongIds: JSON.stringify(getBelongIds()), value });
   }
 
   useEffect(() => {
@@ -200,10 +221,12 @@ function MapBody() {
   if (edit === 'ערוך') {
     if (selection?.enable) selection.enable();
   }
-  if (edit === 'אל תערוך') {
+  if (edit === 'אל תערוך' && !fixedState) {
     if (selection?.disable) selection.disable();
   }
-
+  if (fixedState) {
+    if (selection?.enable) selection.enable();
+  }
   function onMousedown(event) {
     const { classList } = event.target;
     if (
@@ -297,6 +320,10 @@ function MapBody() {
     if (edit === 'ערוך') {
       if (event.code === 'Enter') map_add();
       if (event.code === 'Delete') map_delete();
+    }
+    if (fixedState) {
+      if (event.code === 'Enter') setFixed(true);
+      if (event.code === 'Delete') setFixed(false);
     }
   }
 

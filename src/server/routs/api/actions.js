@@ -416,7 +416,6 @@ projectActions.scheduling = async (request_body) => {
   const tags = await getTags(project_id);
 
   const tagsAsObject = {};
-  console.log(tags);
   tags.forEach((tag) => {
     tagsAsObject[tag.id] = tag;
   });
@@ -424,7 +423,6 @@ projectActions.scheduling = async (request_body) => {
     calculat_seats_belongs(seats_belongs);
 
   guests_result = guests_result.filter((guest) => {
-    console.log(guest.active);
     return guest.active === 1;
   });
 
@@ -467,10 +465,41 @@ projectActions.scheduling = async (request_body) => {
     const guest = guests[random_guest_index];
     const guest_id = guest.id;
 
-    if (guest.number_of_seats > 1) {
-      guests.splice(random_guest_index, 1);
-      continue;
-    }
+    // if (guest.number_of_seats > 1) {
+    //   const seatsByRows = {};
+    //   const seatsByRowsDiv = {};
+    //   const seatsDiv = [];
+    //   const divsByScore = {};
+    //   seats.forEach((seat) => (seatsByRows[seat.row_num] = []));
+    //   seats.forEach((seat) => (seatsByRowsDiv[seat.row_num] = []));
+    //   seats.forEach((seat) => seatsByRows[seat.row_num].push(seat));
+    //   Object.keys(seatsByRows).forEach((row) => {
+    //     let prevCol = -1;
+    //     seatsByRows[row].sort((a, b) => a.col_num - b.col_num);
+    //     seatsByRows[row].forEach((seat) => {
+    //       if (seat.col_num - 1 === prevCol) seatsByRowsDiv[row].push(seat);
+    //       else {
+    //         seatsByRowsDiv[row] = [];
+    //         seatsByRowsDiv[row].push(seat);
+    //       }
+    //       prevCol = seat.col_num;
+    //     });
+    //   });
+    //   Object.keys(seatsByRowsDiv).forEach((row) => {
+    //     const seats = seatsByRowsDiv[row];
+    //     seatsDiv.push(seats);
+    //   });
+    //   seatsDiv.forEach((seats) => {
+    //     let score = 0;
+    //     seats.forEach((seat) => {
+    //       score += seat.score;
+    //     });
+    //     divsByScore[score] = seats;
+    //   });
+    //   console.log(divsByScore);
+    //   // guests.splice(random_guest_index, 1);
+    //   // continue;
+    // }
     const seats_scores = getSeatsScores(seats);
     let height_seats = getSeatWithScore(seats, seats_scores[0]);
 
