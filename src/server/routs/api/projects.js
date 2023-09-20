@@ -164,7 +164,7 @@ projects.import = async function (request_body) {
     for (const seat of seats) {
       const seatId = newIds[seat.id];
       const mapId = newIds[seat.belong];
-      const query_string = `INSERT INTO seats(id, belong, row_num, col_num, seat_number, map, project) VALUES('${seatId}', '${mapId}', '${seat.row_num}', '${seat.col_num}', '${seat.seat_number}', '${mapId}', '${newProjectId}');`;
+      const query_string = `INSERT INTO seats(id, belong, row_num, col_num, seat_number, map, project) VALUES('${seatId}', '${mapId}', '${seat.row_num}', '${seat.col_num}', ${seat.seat_number}, '${mapId}', '${newProjectId}');`;
       await db_post(query_string);
     }
   }
@@ -173,7 +173,7 @@ projects.import = async function (request_body) {
       const belongId = newIds[belong.id];
       const guestId = newIds[belong.guest];
       const seatId = newIds[belong.seat];
-      const query_string = `INSERT INTO belong(id, guest, seat, project) VALUES('${belongId}', '${guestId}', '${seatId}', '${newProjectId}');`;
+      const query_string = `INSERT INTO belong(id, guest, seat, fixed, project) VALUES('${belongId}', '${guestId}', '${seatId}', ${belong.fixed},'${newProjectId}');`;
       await db_post(query_string);
     }
   }

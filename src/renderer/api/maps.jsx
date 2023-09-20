@@ -189,6 +189,20 @@ function useUpdate() {
         let msg;
         msg = JSON.stringify({
           action: 'invalidate',
+          query_key: [],
+        });
+        msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['seats_groups', { map_name, project_name }],
+        });
+        msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['elements', { map_name, project_name }],
+        });
+        hiveSocket.send(msg);
+        hiveSocket.send(msg);
+        msg = JSON.stringify({
+          action: 'invalidate',
           query_key: ['map', { map_name, project_name }],
         });
         hiveSocket.send(msg);

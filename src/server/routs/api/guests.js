@@ -41,9 +41,16 @@ async function getGuestGroupScoreByIdNumber(id_number) {
 }
 
 guests.create = async function (request_body) {
-  check_parameters(['guests', 'project_name', 'socketId'], request_body);
+  check_parameters(
+    ['guests', 'check_list', 'project_name', 'socketId'],
+    request_body
+  );
   const { guests } = request_body;
   const { socketId } = request_body;
+  // console.log(request_body.dabuls);
+  // const dabuls = request_body.dabuls === 'true';
+  const dabuls = request_body.dabuls;
+  const check_list = JSON.parse(request_body.check_list);
   const data = JSON.parse(guests);
   const { project_name } = request_body;
   const project_id = await get_project_id(project_name);
@@ -56,45 +63,104 @@ guests.create = async function (request_body) {
   const progressInterval = setInterval(() => {
     update_progress();
   }, 500);
+
   for (const guest of data) {
-    let query_string = '';
-    const first_name = guest[0];
-    const last_name = guest[1];
-    const guest_group = guest[2];
-    const seat_number = guest[3];
-    let id_number;
-    if (request_body.importSeatNumber !== 'undefined') {
-      id_number = guest[4];
-    } else {
-      id_number = guest[3];
+    for (let i = 0; i < 11; i++) {
+      guest[i] = guest[i] ? guest[i] : null;
     }
+    let query_string = '';
+    const id_number = check_list.indexOf(0) === -1 ? null : guest[0];
+    let active = check_list.indexOf(1) === -1 ? null : guest[1];
+    let first_name = check_list.indexOf(2) === -1 ? null : guest[2];
+    let last_name = check_list.indexOf(3) === -1 ? null : guest[3];
+    const guest_group = check_list.indexOf(4) === -1 ? null : guest[4];
+    const seat_number = check_list.indexOf(5) === -1 ? null : guest[5];
+    // const requests_1 = guest[6] !== null ? guest[0] : 0;
+    // const requests_2 = guest[7] !== null ? guest[0] : 0;
+    // const requests_3 = guest[8] !== null ? guest[0] : 0;
+    let amount = check_list.indexOf(9) === -1 ? null : guest[9];
+    const notes = check_list.indexOf(10) === -1 ? null : guest[10];
+    amount = amount || 0;
+    active = active || 0;
+    first_name = first_name || '';
+    last_name = last_name || '';
+    // const phone = guest[11] !== null ? guest[0] : '';
     completed_iterations++;
     progress = (completed_iterations / total_iterations) * 100;
     progress = Math.round(progress);
-    if (!first_name || !last_name || !guest_group) continue;
-    const guest_group_id = await get_group_id(project_id, guest_group);
+    // if (!first_name || !last_name || !guest_group) continue;
+    const guest_group_id = guest_group
+      ? await get_group_id(project_id, guest_group)
+      : null;
     const s_query_string = `SELECT * FROM guests WHERE first_name='${first_name}' AND last_name='${last_name}' AND guest_group='${guest_group}' AND project='${project_id}'`;
-    if (await check_not_exists_f(s_query_string)) {
-      if (request_body.importSeatNumber !== 'undefined') {
-        const guestId = uuidv4();
-        query_string += `INSERT INTO guests(id, first_name, last_name, guest_group, project) VALUES('${guestId}', '${first_name}', '${last_name}', '${guest_group_id}', '${project_id}');`;
-        const seat = await db_get(
-          `SELECT * FROM seats WHERE project='${project_id}' AND seat_number='${seat_number}'`
-        );
-        if (seat[0]) {
-          const seatId = seat[0].id;
-          let query_string_2 = '';
-          query_string_2 += `DELETE FROM belong WHERE guest='${guestId}';`;
-          query_string_2 += `DELETE FROM belong WHERE seat='${seatId}';`;
-          query_string_2 += `INSERT INTO belong(id, guest, seat, project) VALUES(UUID(), '${guestId}', '${seatId}', '${project_id}');`;
-          await db_post(query_string_2);
-        }
-      } else if (request_body.importIdNumber !== 'undefined') {
-        query_string += `INSERT INTO guests(id, id_number, first_name, last_name, guest_group, project) VALUES(UUID(), '${id_number}', '${first_name}', '${last_name}', '${guest_group_id}', '${project_id}');`;
-      } else {
-        query_string += `INSERT INTO guests(id, first_name, last_name, guest_group, project) VALUES(UUID(), '${first_name}', '${last_name}', '${guest_group_id}', '${project_id}');`;
+    if ((await check_not_exists_f(s_query_string)) || dabuls) {
+      // console.log('🚑🚛🦽🦽🚜');
+      const guestId = uuidv4();
+      query_string += `INSERT INTO guests(id, id_number, active, first_name, last_name, guest_group, number_of_seats, notes, project) VALUES('${guestId}', ${id_number}, ${active}, '${first_name}', '${last_name}', '${guest_group_id}', ${amount}, ${notes}, '${project_id}');`;
+      const seat = await db_get(
+        `SELECT * FROM seats WHERE project='${project_id}' AND seat_number='${seat_number}'`
+      );
+      if (seat[0]) {
+        const seatId = seat[0].id;
+        let query_string_2 = '';
+        query_string_2 += `DELETE FROM belong WHERE guest='${guestId}';`;
+        query_string_2 += `DELETE FROM belong WHERE seat='${seatId}';`;
+        query_string_2 += `INSERT INTO belong(id, guest, seat, project) VALUES(UUID(), '${guestId}', '${seatId}', '${project_id}');`;
+        await db_post(query_string_2);
       }
+    } else {
+      continue;
     }
+    // if (await check_not_exists_f(s_query_string)) {
+    //   if (
+    //     request_body.importSeatNumber !== 'undefined' &&
+    //     request_body.importIdNumber === 'undefined'
+    //   ) {
+    //     const guestId = uuidv4();
+    //     query_string += `INSERT INTO guests(id, first_name, last_name, guest_group, project) VALUES('${guestId}', '${first_name}', '${last_name}', '${guest_group_id}', '${project_id}');`;
+    //     const seat = await db_get(
+    //       `SELECT * FROM seats WHERE project='${project_id}' AND seat_number='${seat_number}'`
+    //     );
+    //     if (seat[0]) {
+    //       const seatId = seat[0].id;
+    //       let query_string_2 = '';
+    //       query_string_2 += `DELETE FROM belong WHERE guest='${guestId}';`;
+    //       query_string_2 += `DELETE FROM belong WHERE seat='${seatId}';`;
+    //       query_string_2 += `INSERT INTO belong(id, guest, seat, project) VALUES(UUID(), '${guestId}', '${seatId}', '${project_id}');`;
+    //       await db_post(query_string_2);
+    //     }
+    //   }
+    //   if (
+    //     request_body.importIdNumber !== 'undefined' &&
+    //     request_body.importSeatNumber === 'undefined'
+    //   ) {
+    //     query_string += `INSERT INTO guests(id, id_number, first_name, last_name, guest_group, project) VALUES(UUID(), '${id_number}', '${first_name}', '${last_name}', '${guest_group_id}', '${project_id}');`;
+    //   }
+    //   if (
+    //     request_body.importSeatNumber !== 'undefined' &&
+    //     request_body.importIdNumber !== 'undefined'
+    //   ) {
+    //     const guestId = uuidv4();
+    //     query_string += `INSERT INTO guests(id, id_number, first_name, last_name, guest_group, project) VALUES('${guestId}', '${id_number}', '${first_name}', '${last_name}', '${guest_group_id}', '${project_id}');`;
+    //     const seat = await db_get(
+    //       `SELECT * FROM seats WHERE project='${project_id}' AND seat_number='${seat_number}'`
+    //     );
+    //     if (seat[0]) {
+    //       const seatId = seat[0].id;
+    //       let query_string_2 = '';
+    //       query_string_2 += `DELETE FROM belong WHERE guest='${guestId}';`;
+    //       query_string_2 += `DELETE FROM belong WHERE seat='${seatId}';`;
+    //       query_string_2 += `INSERT INTO belong(id, guest, seat, project) VALUES(UUID(), '${guestId}', '${seatId}', '${project_id}');`;
+    //       await db_post(query_string_2);
+    //     }
+    //   }
+    //   if (
+    //     request_body.importSeatNumber === 'undefined' &&
+    //     request_body.importIdNumber === 'undefined'
+    //   ) {
+    //     query_string += `INSERT INTO guests(id, first_name, last_name, guest_group, project) VALUES(UUID(), '${first_name}', '${last_name}', '${guest_group_id}', '${project_id}');`;
+    //   }
+    // }
     await db_post(query_string);
   }
   completed_iterations++;
@@ -140,6 +206,13 @@ guests.update = async function (request_body) {
     let { active } = request_body;
     active = active === 'true' ? 1 : 0;
     const query_string = `UPDATE guests SET active = '${active}' WHERE project = '${project_id}'`;
+    await db_post(query_string);
+  };
+  filds.id_number = async function () {
+    check_parameters(['guest_id'], request_body);
+    const { guest_id } = request_body;
+    const { id_number } = request_body;
+    const query_string = `UPDATE guests SET id_number = ${id_number} WHERE id = '${guest_id}'`;
     await db_post(query_string);
   };
   filds.activeByIdNumber = async function () {
@@ -204,8 +277,11 @@ guests.update = async function (request_body) {
   };
   filds.notes = async function () {
     check_parameters(['guest_id'], request_body);
-    const { guest_id, notes } = request_body;
-    const query_string = `UPDATE guests SET notes = '${notes}' WHERE id = '${guest_id}'`;
+    let { notes } = request_body;
+    const { guest_id } = request_body;
+    notes = notes === 'null' ? null : notes;
+    notes = notes ? `'${notes}'` : notes;
+    const query_string = `UPDATE guests SET notes = ${notes} WHERE id = '${guest_id}'`;
     await db_post(query_string);
   };
   check_parameters(['fild'], request_body);

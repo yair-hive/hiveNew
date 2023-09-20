@@ -93,11 +93,21 @@ maps.update = async function (request_body) {
     const { project_name } = request_body;
     const { map_name } = request_body;
     const map_id = await get_map_id(map_name, project_name);
+    const mapResults = await db_get(
+      `SELECT * FROM maps WHERE id = '${map_id}'`
+    );
+    const mapRowsNum = mapResults[0].rows_number - 1;
+
+    console.log(mapRowsNum);
+
     const { row } = request_body;
     let query_string = '';
+
     query_string += `UPDATE maps SET rows_number = rows_number - 1 WHERE id = '${map_id}';`;
     query_string += `DELETE FROM seats WHERE row_num = '${row}' AND map='${map_id}';`;
     query_string += `UPDATE SEATS SET row_num = row_num - 1 WHERE row_num > '${row}' AND map='${map_id}';`;
+    query_string += `UPDATE map_elements SET to_row = to_row - 1 WHERE to_row > '${mapRowsNum}' AND map='${map_id}';`;
+    query_string += `UPDATE seats_groups SET to_row = to_row - 1 WHERE to_row > '${mapRowsNum}' AND map='${map_id}';`;
     return await db_post(query_string);
   };
   filds.delete_col = async function () {

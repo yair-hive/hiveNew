@@ -197,8 +197,55 @@ function SeatNumberCell({ value }) {
     </div>
   );
 }
-function IdNumberCell({ value }) {
-  return <div style={{ padding: '5px' }}> {value} </div>;
+// function IdNumberCellPP({ value }) {
+//   return <div style={{ padding: '5px' }}> {value} </div>;
+// }
+function IdNumberCell(props) {
+  const initialValue = props.value;
+  const guest_id = props.cell.row.id;
+
+  const [isIdNumberInput, setIdNumberInput] = useState(false);
+  const [idNumber, setIdNumber] = useState(initialValue);
+  const updateIdNumber = api.guests.useUpdate().id_number;
+
+  function onTdClick() {
+    setIdNumberInput(true);
+  }
+
+  useEffect(() => {
+    setIdNumber(initialValue);
+  }, [initialValue]);
+
+  function onInputBlur() {
+    setIdNumberInput(false);
+    updateIdNumber({ idNumber, guest_id });
+  }
+
+  function onInputChange(event) {
+    setIdNumber(event.target.value);
+  }
+  const width = idNumber ? idNumber.length : 5;
+
+  if (isIdNumberInput) {
+    return (
+      <input
+        type="text"
+        autoFocus
+        value={idNumber}
+        onBlur={onInputBlur}
+        onChange={onInputChange}
+        style={{
+          width: `${width}ch`,
+        }}
+      />
+    );
+  }
+
+  return (
+    <div className="text_cell" onClick={onTdClick}>
+      {idNumber}
+    </div>
+  );
 }
 function LastNameCell(props) {
   const initialValue = props.value;
@@ -224,6 +271,7 @@ function LastNameCell(props) {
   function onInputChange(event) {
     setLast(event.target.value);
   }
+  const width = last ? last.length : 5;
 
   if (isLastInput) {
     return (
@@ -234,7 +282,7 @@ function LastNameCell(props) {
         onBlur={onInputBlur}
         onChange={onInputChange}
         style={{
-          width: `${last.length}ch`,
+          width: `${width}ch`,
         }}
       />
     );
@@ -269,6 +317,8 @@ function FirstNameCell(props) {
     setFirst(event.target.value);
   }
 
+  const width = first ? first.length : 5;
+
   if (isFirstInput) {
     return (
       <input
@@ -278,7 +328,7 @@ function FirstNameCell(props) {
         onBlur={onInputBlur}
         onChange={onInputChange}
         style={{
-          width: `${first.length}ch`,
+          width: `${width}ch`,
         }}
       />
     );
@@ -313,6 +363,8 @@ function GroupNameCell(props) {
     setGroup(event.target.value);
   }
 
+  const width = group ? group.length : 5;
+
   if (isGroupInput) {
     return (
       <input
@@ -322,7 +374,7 @@ function GroupNameCell(props) {
         onBlur={onInputBlur}
         onChange={onInputChange}
         style={{
-          width: `${group.length}ch`,
+          width: `${width}ch`,
         }}
       />
     );
@@ -546,6 +598,8 @@ function NotesCell(props) {
     setNotes(event.target.value);
   }
 
+  const width = notes ? notes.length : 5;
+
   if (isNotesInput) {
     return (
       <input
@@ -555,7 +609,7 @@ function NotesCell(props) {
         onBlur={onInputBlur}
         onChange={onInputChange}
         style={{
-          width: `${notes.length}ch`,
+          width: `${width}ch`,
         }}
       />
     );
@@ -812,11 +866,11 @@ function GuestsTable() {
     // });
     // return rows;
     return rows.sort((a, b) => {
-      const groupComper = a.group_name.localeCompare(b.group_name);
+      const groupComper = a.group_name?.localeCompare(b.group_name);
       if (groupComper) return groupComper;
-      const lastNameComper = a.last_name.localeCompare(b.last_name);
+      const lastNameComper = a.last_name?.localeCompare(b.last_name);
       if (lastNameComper) return lastNameComper;
-      const firstNameComper = a.first_name.localeCompare(b.first_name);
+      const firstNameComper = a.first_name?.localeCompare(b.first_name);
       if (firstNameComper) return firstNameComper;
       return 0;
     });

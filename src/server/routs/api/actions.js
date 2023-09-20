@@ -193,7 +193,7 @@ function calculat_requests(guests, requests) {
   const requests_as_object = {};
   requests.forEach((request) => (requests_as_object[request.guest] = []));
   requests.forEach((request) =>
-    requests_as_object[request.guest].push(request.request)
+    requests_as_object[request.guest].push(request)
   );
   return guests.map((guest) => {
     if (requests_as_object[guest.id])
@@ -338,11 +338,17 @@ function getSeatWithScore(seats, score) {
   });
   return new_seats;
 }
-function getSeatWithTag(seats, tag) {
+function getSeatWithTag(seats, tags) {
+  function checkTags(seat) {
+    for (const tag of tags) {
+      if (seat.tags.indexOf(tag) === -1) return false;
+    }
+    return true;
+  }
   const new_seats = [];
   seats.forEach((seat, index) => {
     if (seat.tags) {
-      if (seat.tags.indexOf(tag) > -1) {
+      if (checkTags(seat)) {
         seat.index = index;
         new_seats.push(seat);
       }
@@ -504,8 +510,15 @@ projectActions.scheduling = async (request_body) => {
     let height_seats = getSeatWithScore(seats, seats_scores[0]);
 
     if (guest.requests) {
-      for (let i = 0; i < guest.requests.length; i++) {
-        const seats_with_tags = getSeatWithTag(seats, guest.requests[i]);
+      const requestsByIndex = [];
+      guest.requests.forEach((request) => {
+        requestsByIndex[request.index_key] = [];
+      });
+      guest.requests.forEach((request) => {
+        requestsByIndex[request.index_key].push(request.request);
+      });
+      for (let i = 1; i < requestsByIndex.length; i++) {
+        const seats_with_tags = getSeatWithTag(seats, requestsByIndex[i]);
         if (getSeatWithTagAndScore(seats_with_tags).length > 0) {
           height_seats = getSeatWithTagAndScore(seats_with_tags);
           break;

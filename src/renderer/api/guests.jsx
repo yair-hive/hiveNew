@@ -26,7 +26,7 @@ function useCreate() {
   const hiveSocket = useSocket();
 
   const mutation = useMutation(
-    ({ guestsData, importSeatNumber, importIdNumber }) => {
+    ({ guestsData, importSeatNumber, importIdNumber, check_list, dabuls }) => {
       const guestsDataString = JSON.stringify(guestsData);
       const body = {
         category: 'guests',
@@ -36,6 +36,8 @@ function useCreate() {
         importIdNumber,
         project_name,
         socketId,
+        check_list,
+        dabuls,
       };
       return hiveFetch(body);
     },
@@ -154,6 +156,27 @@ function useUpdate() {
         fild: 'activeAll',
         project_name,
         active,
+      };
+      return hiveFetch(body);
+    },
+    {
+      onSuccess: () => {
+        const msg = JSON.stringify({
+          action: 'invalidate',
+          query_key: ['guests', { project_name }],
+        });
+        hiveSocket.send(msg);
+      },
+    }
+  );
+  const idNumberMutation = useMutation(
+    ({ guest_id, idNumber }) => {
+      const body = {
+        category: 'guests',
+        action: 'update',
+        fild: 'id_number',
+        guest_id,
+        id_number: idNumber,
       };
       return hiveFetch(body);
     },
@@ -295,6 +318,7 @@ function useUpdate() {
     }
   );
   return {
+    id_number: idNumberMutation.mutate,
     active: activeMutation.mutate,
     activeAll: activeAllMutation.mutate,
     last: lastMutation.mutate,
