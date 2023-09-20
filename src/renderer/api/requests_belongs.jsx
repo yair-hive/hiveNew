@@ -22,12 +22,13 @@ function useCreate() {
   const { project_name } = useParams();
   const hiveSocket = useSocket();
   const mutation = useMutation(
-    ({ guest_id, tag_id }) => {
+    ({ guest_id, tag_id, index_key }) => {
       const body = {
         category: 'requests_belongs',
         action: 'create',
         guest_id,
         tag_id,
+        index_key,
         project_name,
       };
       return hiveFetch(body);

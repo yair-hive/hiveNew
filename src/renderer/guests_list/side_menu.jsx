@@ -90,10 +90,10 @@ function GuestsSideMenu() {
     <div className="sub_menu">
       <ProjectSideMenu />
       <HiveButton onClick={() => hive.openPopUp('add_guest')}>
-        הוסף בחורים
+        הוסף שמות
       </HiveButton>
       <AddGuest id="add_guest" />
-      <HiveButton onClick={() => setImportPop(true)}>ייבא בחורים</HiveButton>
+      <HiveButton onClick={() => setImportPop(true)}> ייבא שמות </HiveButton>
       <HiveButton onClick={delete_all_guests}>מחק את כל השמות</HiveButton>
       <ImportGuests status={importPop} setState={setImportPop} />
       <HiveButton onClick={() => setGroupsPop(true)}> קבוצות </HiveButton>

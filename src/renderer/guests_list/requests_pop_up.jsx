@@ -1,3 +1,7 @@
+/* eslint-disable jsx-a11y/tabindex-no-positive */
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/jsx-no-bind */
 /* eslint-disable camelcase */
 /* eslint-disable consistent-return */
@@ -12,7 +16,7 @@ import PopUp from 'renderer/hive_elements/pop_up';
 import React, { useContext, useState } from 'react';
 import api from 'renderer/api/api';
 import { useTable, useSortBy } from 'react-table';
-import { RequestBox } from 'renderer/components/requestsCount';
+import RequestsCount from 'renderer/components/requestsCount';
 import HiveButton from 'renderer/hive_elements/hive_button';
 import RollingList from 'renderer/hive_elements/rolling_list';
 import { RequestsCurrentGuestContest } from './guests_table';
@@ -24,7 +28,7 @@ function RequestsTable({ data, columns }) {
         data,
         columns,
         getRowId(row, relativeIndex) {
-          return data[relativeIndex].id;
+          return data[relativeIndex].index_key;
         },
       },
       useSortBy
@@ -73,11 +77,58 @@ function PriorityCell({ value }) {
   );
 }
 function RequestCell(props) {
-  const requestId = props.cell.row.id;
+  const tags = api.tags.useData();
+  const add_request = api.requestsBelongs.useCreate();
+  const [dropStatus, setDrop] = useState(false);
+  const [requestsCurrentGuset] = useContext(RequestsCurrentGuestContest);
+  const rowId = props.cell.row.id;
+
+  function createItems() {
+    if (tags.data) {
+      const tags_array = Object.entries(tags.data);
+      const items = [];
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for (const [key, tag] of tags_array) {
+        items.push({ name: tag.name, value: tag.id });
+      }
+      return items;
+    }
+  }
+
+  function onItem(item) {
+    const data = {
+      guest_id: requestsCurrentGuset,
+      tag_id: item.value,
+      index_key: rowId,
+    };
+    // eslint-disable-next-line promise/catch-or-return, promise/always-return
+    add_request(data).then(() => {
+      setDrop(false);
+    });
+  }
 
   return (
-    <div style={{ padding: '5px' }}>
-      <RequestBox request_id={requestId} tag_id={props.value} />
+    <div
+      style={{ padding: '5px', outline: 'none' }}
+      onClick={() => setDrop(!dropStatus)}
+      tabIndex={1}
+      onBlur={() => setDrop(false)}
+    >
+      {/* <RequestBox request_id={requestId} tag_id={props.value} /> */}
+      <RequestsCount value={props.value} />
+      <div
+        className="drop_down"
+        style={{
+          // position: 'relative'
+          position: 'absolute',
+          left: '-50%',
+          display: dropStatus ? 'inline-block' : 'none',
+          cursor: 'pointer',
+          margin: 0,
+        }}
+      >
+        {tags ? <RollingList items={createItems()} onItemClick={onItem} /> : ''}
+      </div>
     </div>
   );
 }
@@ -127,7 +178,7 @@ function RequestsPopUp() {
       },
       {
         Header: 'בקשה',
-        accessor: 'request',
+        accessor: 'requests',
         Cell: RequestCell,
       },
       {
@@ -140,12 +191,23 @@ function RequestsPopUp() {
   );
   if (requests.data) {
     const requestsObject = {};
+    const newRequestsObject = {};
     requests.data.forEach((request) => {
-      requestsObject[request.guest] = [];
+      requestsObject[request.guest] = {};
     });
-    requests.data.forEach((request) =>
-      requestsObject[request.guest].push(request)
-    );
+    requests.data.forEach((request) => {
+      requestsObject[request.guest][request.index_key] = [];
+    });
+    requests.data.forEach((request) => {
+      requestsObject[request.guest][request.index_key].push(request);
+    });
+    requests.data.forEach((request) => {
+      newRequestsObject[request.guest] = Object.entries(
+        requestsObject[request.guest]
+      ).map(([key, value]) => {
+        return { index_key: key, requests: value };
+      });
+    });
 
     function createItems() {
       if (tags.data) {
@@ -199,7 +261,7 @@ function RequestsPopUp() {
         <PopUp status={requestsCurrentGuset} setState={setRequestsCurrentGuset}>
           <div>
             <RequestsTable
-              data={requestsObject[requestsCurrentGuset]}
+              data={newRequestsObject[requestsCurrentGuset]}
               columns={columns}
             />
             <HiveButton onClick={() => setDrop(true)}> הוסף </HiveButton>
@@ -211,7 +273,7 @@ function RequestsPopUp() {
       <PopUp status={requestsCurrentGuset} setState={setRequestsCurrentGuset}>
         <div>
           <RequestsTable
-            data={requestsObject[requestsCurrentGuset]}
+            data={newRequestsObject[requestsCurrentGuset]}
             columns={columns}
           />
           <HiveButton active> הוסף </HiveButton>

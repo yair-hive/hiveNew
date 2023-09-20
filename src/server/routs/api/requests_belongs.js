@@ -36,16 +36,24 @@ requests_belongs.create = async function (request_body) {
 
   const project_id = await get_project_id(project_name);
   let query_string = ``;
-  query_string = `SELECT * FROM guests_requests WHERE guest = '${guest_id}' AND request = '${request_id}'`;
-  await check_exists(query_string);
-  query_string = `SELECT * FROM guests_requests WHERE guest = '${guest_id}'`;
-  const guestRequests = await db_get(query_string);
 
-  const GRIK = guestRequests.map((req) => {
-    return req?.index_key;
-  });
-  let newIK = 1;
-  if (GRIK.length) newIK = Math.max(...GRIK) + 1;
+  let newIK;
+
+  if (request_body.index_key === 'undefined') {
+    query_string = `SELECT * FROM guests_requests WHERE guest = '${guest_id}'`;
+    const guestRequests = await db_get(query_string);
+
+    const GRIK = guestRequests.map((req) => {
+      return req?.index_key;
+    });
+    newIK = 1;
+    if (GRIK.length) newIK = Math.max(...GRIK) + 1;
+  } else {
+    newIK = request_body.index_key;
+  }
+
+  query_string = `SELECT * FROM guests_requests WHERE guest = '${guest_id}' AND request = '${request_id}' AND index_key = '${newIK}'`;
+  await check_exists(query_string);
 
   query_string = `INSERT INTO guests_requests(id, guest, request, project, index_key) VALUES(UUID(), '${guest_id}', '${request_id}', '${project_id}', '${newIK}')`;
   await db_post(query_string);
@@ -57,11 +65,17 @@ requests_belongs.delete = async function (request_body) {
     `SELECT * FROM guests_requests WHERE id = '${request_id}'`
   );
 
+  const request2 = await db_get(
+    `SELECT * FROM guests_requests WHERE guest = '${request[0].guest}' AND index_key = ${request[0].index_key}`
+  );
+
   const query_string = `DELETE FROM guests_requests WHERE id = '${request_id}'`;
   await db_post(query_string);
-  await db_post(
-    `UPDATE guests_requests SET index_key = index_key -1 WHERE guest = '${request[0].guest}' AND index_key > ${request[0].index_key}`
-  );
+  if (!request2[1]) {
+    await db_post(
+      `UPDATE guests_requests SET index_key = index_key -1 WHERE guest = '${request[0].guest}' AND index_key > ${request[0].index_key}`
+    );
+  }
 };
 requests_belongs.get_all = async function (request_body) {
   check_parameters(['project_name'], request_body);

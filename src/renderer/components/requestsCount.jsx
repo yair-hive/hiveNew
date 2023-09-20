@@ -13,7 +13,8 @@ export function RequestBox({ request_id, tag_id }) {
   const [active, setActive] = useState(true);
   const delete_request = api.requestsBelongs.useDelete();
 
-  function onClickDelete() {
+  function onClickDelete(e) {
+    e.stopPropagation();
     setActive(false);
     delete_request({ request_id });
   }
