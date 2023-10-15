@@ -48,6 +48,7 @@
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "start:server": "wait-on tcp:3306 && nodemon src/server/main.js",
     "start:mysql": "start /min assets/mysql/bin/mysqld.exe --standalone --explicit_defaults_for_timestamp -P 3306 --console",
+    "start_in_server": "npm run start:server && npm run start:renderer",
     "test": "jest"
   },
   "browserslist": [],
