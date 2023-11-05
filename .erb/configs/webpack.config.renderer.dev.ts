@@ -23,21 +23,6 @@ const skipDLLs =
   module.parent?.filename.includes('webpack.config.renderer.dev.dll') ||
   module.parent?.filename.includes('webpack.config.eslint');
 
-/**
- * Warn if the DLL is not built
- */
-if (
-  !skipDLLs &&
-  !(fs.existsSync(webpackPaths.dllPath) && fs.existsSync(manifest))
-) {
-  console.log(
-    chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
-    )
-  );
-  execSync('npm run postinstall');
-}
-
 const configuration: webpack.Configuration = {
   devtool: 'inline-source-map',
 
